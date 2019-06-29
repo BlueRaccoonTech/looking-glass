@@ -60,8 +60,9 @@ class _MyListScreenState extends State {
               text: new TextSpan(
                 children: [
                   TextSpan(
-                    text: 'An app for quickly displaying public posts from any '
-                        'Mastodon API-compatible social media website.\n\n'
+                    text: 'A reconnaissance tool for quickly displaying public '
+                        'posts from any social media website compatible with the '
+                        'Mastodon API.\n\n'
                         'App designed and created by ',
                     style: TextStyle(color: Colors.black),
                   ),
@@ -339,18 +340,15 @@ class _MyListScreenState extends State {
                               Expanded(
                                 child: Text(''),
                               ),
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                child: IconButton(
-                                  icon: Icon(
-                                    Icons.link,
-                                    color: Colors.black,
-                                    size: 30.0,
-                                  ),
-                                  onPressed: () {
-                                    launch(timeline[index].url);
-                                  },
+                              IconButton(
+                                icon: Icon(
+                                  Icons.link,
+                                  color: Colors.black,
+                                  size: 30.0,
                                 ),
+                                onPressed: () {
+                                  launch(timeline[index].url);
+                                },
                               ),
                             ],
                           ),
