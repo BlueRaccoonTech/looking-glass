@@ -309,7 +309,7 @@ class _MyListScreenState extends State {
                               Padding(
                                 padding: EdgeInsets.fromLTRB(15, 0, 4, 0),
                                 child: Icon(
-                                  Icons.settings_input_antenna,
+                                  Icons.record_voice_over,
                                   color: Colors.green,
                                   size: 30.0,
                                 ),
