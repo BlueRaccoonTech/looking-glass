@@ -89,6 +89,15 @@ class _MyListScreenState extends State {
                   ),
                   URLizer.makeURL('https://git.frinkel.tech/root/looking-glass',
                     'https://git.frinkel.tech/root/looking-glass', context),
+                  TextSpan(
+                    text: '\n\n'
+                        'A few big instances you can try with this app:\n'
+                        'pleroma.site\n'
+                        'mastodon.social\n'
+                        'radical.town\n'
+                        'hackers.town',
+                    style: TextStyle(color: Colors.black),
+                  ),
                 ],
               ),
             ),
