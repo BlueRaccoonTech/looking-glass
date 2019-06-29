@@ -1,3 +1,10 @@
+/// Hello there!
+/// I hope you don't mind my mess of a "main" file!
+/// This app was honestly the work of one late night and one all-nighter.
+/// (yes, I'm actually running on zero sleep right now.)
+/// (I blame the fact I somehow work really well when I'm under pressure and
+/// heavy time constraints, in the middle of the night. ^^")
+
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
@@ -38,7 +45,7 @@ class _MyListScreenState extends State {
   final specifyAnInstance = TextEditingController();
 
   _getUsers() {
-    APIConnector.getTimeline("https://" + targetInstance).then((response) {
+    APIConnector.getTimeline(targetInstance).then((response) {
       setState(() {
         Iterable list = json.decode(response.body);
         timeline = list.map((model) => Status.fromJson(model)).toList();
