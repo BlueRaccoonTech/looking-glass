@@ -1,6 +1,7 @@
 // A class for parsing JSON-encoded statuses pulled from Mastodon API.
 import 'mstdn_acct.dart';
 import 'package:html2md/html2md.dart' as html2md;
+import 'package:intl/intl.dart';
 
 class Status {
   final String id;
@@ -36,6 +37,9 @@ class Status {
       Status tempReblog = Status.fromJson(parsedJson['reblog']);
       tempAccount = tempReblog.account;
     }
+
+    DateTime convertedTime = DateTime.parse(parsedJson['created_at']).toLocal();
+    String readableTime = DateFormat.yMEd().add_jms().format(convertedTime);
     return Status(
       id: parsedJson['id'],
       url: parsedJson['url'],
@@ -44,7 +48,7 @@ class Status {
       inReplyToAccountId: parsedJson['in_reply_to_account_id'],
       //reblog: tempReblog,
       content: html2md.convert(parsedJson['content']),
-      createdAt: parsedJson['created_at'],
+      createdAt: readableTime,
       repliesCount: parsedJson['replies_count'],
       reblogsCount: parsedJson['reblogs_count'],
       favouritesCount: parsedJson['favourites_count'],
