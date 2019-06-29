@@ -303,7 +303,7 @@ class _MyListScreenState extends State {
                                 padding: EdgeInsets.fromLTRB(15, 0, 4, 0),
                                 child: Icon(
                                   Icons.favorite,
-                                  color: Colors.orange,
+                                  color: Colors.deepPurple,
                                   size: 30.0,
                                 ),
                               ),
@@ -311,7 +311,7 @@ class _MyListScreenState extends State {
                                 padding: EdgeInsets.fromLTRB(4, 0, 15, 0),
                                 child: Text(
                                   timeline[index].favouritesCount.toString(),
-                                  style: TextStyle(color: Colors.orange),
+                                  style: TextStyle(color: Colors.deepPurple),
                                 ),
                               ),
                               Expanded(
