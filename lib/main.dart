@@ -189,7 +189,10 @@ class _MyListScreenState extends State {
                     icon: Icon(Icons.forward),
                     onPressed: () {
                       SystemChannels.textInput.invokeMethod('TextInput.hide');
-                      targetInstance = specifyAnInstance.text;
+                      if (specifyAnInstance.text != '') {
+                        print(specifyAnInstance.text);
+                        targetInstance = specifyAnInstance.text;
+                      }
                       _getUsers();
                     },
                   ),
