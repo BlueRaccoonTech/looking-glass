@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'mstdn_status.dart';
 import 'mstdn_api.dart';
+import 'interface.dart';
 
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -57,7 +58,7 @@ class _MyListScreenState extends State {
               ],
             ),
             content: RichText(
-              text: new TextSpan(
+              text: TextSpan(
                 children: [
                   TextSpan(
                     text: 'A reconnaissance tool for quickly displaying public '
@@ -66,56 +67,28 @@ class _MyListScreenState extends State {
                         'App designed and created by ',
                     style: TextStyle(color: Colors.black),
                   ),
-                  TextSpan(
-                    text: 'Frinkeldoodle',
-                    style: TextStyle(color: Colors.blue),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        Navigator.of(context).pop();
-                        launch('https://frinkel.tech');
-                      },
-                  ),
+                  URLizer.makeURL('Frinkeldoodle', 'https://frinkel.tech',
+                    context),
                   TextSpan(
                     text: '.\n\n'
                         'Crystal ball icon made by ',
                     style: TextStyle(color: Colors.black),
                   ),
-                  TextSpan(
-                    text: 'Freepik',
-                    style: TextStyle(color: Colors.blue),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        Navigator.of(context).pop();
-                        launch('https://www.freepik.com/');
-                      },
-                  ),
+                  URLizer.makeURL('Freepik', 'https://www.freepik.com/',
+                    context),
                   TextSpan(
                     text: ' from ',
                     style: TextStyle(color: Colors.black),
                   ),
-                  TextSpan(
-                    text: 'flaticon.com',
-                    style: TextStyle(color: Colors.blue),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        Navigator.of(context).pop();
-                        launch('https://www.flaticon.com');
-                      },
-                  ),
+                  URLizer.makeURL('flaticon.com', 'https://www.flaticon.com',
+                      context),
                   TextSpan(
                     text: '\n\n'
                         'Source: ',
                     style: TextStyle(color: Colors.black),
                   ),
-                  TextSpan(
-                    text: 'https://git.frinkel.tech/root/looking-glass',
-                    style: TextStyle(color: Colors.blue),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        Navigator.of(context).pop();
-                        launch('https://git.frinkel.tech/root/looking-glass');
-                      },
-                  ),
+                  URLizer.makeURL('https://git.frinkel.tech/root/looking-glass',
+                    'https://git.frinkel.tech/root/looking-glass', context),
                 ],
               ),
             ),
