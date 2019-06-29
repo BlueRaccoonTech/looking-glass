@@ -38,8 +38,6 @@ class Status {
       tempAccount = tempReblog.account;
     }
 
-    DateTime convertedTime = DateTime.parse(parsedJson['created_at']).toLocal();
-    String readableTime = DateFormat.yMEd().add_jms().format(convertedTime);
     return Status(
       id: parsedJson['id'],
       url: parsedJson['url'],
@@ -48,7 +46,7 @@ class Status {
       inReplyToAccountId: parsedJson['in_reply_to_account_id'],
       //reblog: tempReblog,
       content: html2md.convert(parsedJson['content']),
-      createdAt: readableTime,
+      createdAt: DateFormat.yMEd().add_jms().format(DateTime.parse(parsedJson['created_at']).toLocal()),
       repliesCount: parsedJson['replies_count'],
       reblogsCount: parsedJson['reblogs_count'],
       favouritesCount: parsedJson['favourites_count'],
