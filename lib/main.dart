@@ -64,7 +64,7 @@ class _MyListScreenState extends State {
               children: [
                 TextSpan(
                   text: 'An app for quickly displaying public posts from any '
-                      'Mastodon API-compatible social media network.\n\n'
+                      'Mastodon API-compatible social media website.\n\n'
                       'App designed and created by ',
                   style: TextStyle(color: Colors.black),
                 ),
