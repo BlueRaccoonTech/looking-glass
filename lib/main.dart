@@ -106,6 +106,10 @@ class _MyListScreenState extends State {
               ),
             ],
           ),
+          Divider(
+            height: 0.0,
+            color: Color.fromARGB(255, 0, 0, 0),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: timeline.length,
