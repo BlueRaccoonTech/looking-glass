@@ -7,7 +7,10 @@ class URLizer {
   static TextSpan makeURL (String linkText, String linkUrl, BuildContext context) {
       return TextSpan(
         text: linkText,
-        style: TextStyle(color: Colors.blue),
+        style: TextStyle(
+            color: Colors.blue,
+            decoration: TextDecoration.underline,
+        ),
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).pop();
