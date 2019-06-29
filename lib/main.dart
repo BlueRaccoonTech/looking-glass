@@ -144,6 +144,8 @@ class _MyListScreenState extends State {
   build(context) {
     return Scaffold(
       appBar: AppBar(
+        brightness: Brightness.dark,
+        backgroundColor: Colors.black54,
         leading: IconButton(
           icon: Icon(AppLogo.LookingGlass.crystal_ball),
           onPressed: () {
@@ -214,7 +216,17 @@ class _MyListScreenState extends State {
           ),
           Expanded(
             child: Container(
-              color: Colors.blueGrey,
+              //color: Colors.blueGrey,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.blueGrey,
+                    Colors.black87,
+                  ],
+                ),
+              ),
               child: ListView.builder(
                 itemCount: timeline.length,
                 itemBuilder: (context, index) {
