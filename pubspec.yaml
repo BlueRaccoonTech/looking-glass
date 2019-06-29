@@ -1,5 +1,7 @@
-name: tftown_viewer
-description: An application for browsing Transfurrmation Town (and other Mastodon API-compatible servers!)
+name: looking_glass
+description:
+  An app that can view the public timeline for any instance compatible with the
+  Mastodon API (this includes forks of Mastodon as well as Pleroma.)
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -28,6 +30,7 @@ dependencies:
   image: ^2.1.4
   html2md: ^0.3.1
   flutter_markdown: ^0.2.0
+  url_launcher: ^5.0.3
 
 dev_dependencies:
   flutter_test:
