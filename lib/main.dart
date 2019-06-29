@@ -271,7 +271,10 @@ class _MyListScreenState extends State {
                             visible: timeline[index].subjectText.isNotEmpty,
                             child: Text(
                               timeline[index].subjectText,
-                              style: TextStyle(fontStyle: FontStyle.italic),
+                              style: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.deepPurple,
+                              ),
                             ),
                           ),
                         ),
