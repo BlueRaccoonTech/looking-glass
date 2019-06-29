@@ -165,7 +165,6 @@ class _MyListScreenState extends State {
                   'https://',
                   style: TextStyle(
                     color: Colors.green,
-                    //fontWeight: FontWeight.bold,
                     fontSize: 16.0,
                   ),
                 ),
@@ -206,7 +205,6 @@ class _MyListScreenState extends State {
           ),
           Expanded(
             child: Container(
-              //color: Colors.blueGrey,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
@@ -233,10 +231,6 @@ class _MyListScreenState extends State {
                             child: ListTile(
                               leading:
                                   Image.network(timeline[index].account.avatar),
-                              //title: Text(
-                              //  timeline[index].account.displayName,
-                              //  style: TextStyle(fontWeight: FontWeight.bold),
-                              //),
                               title: RichText(
                                 text: TextSpan(
                                   text: timeline[index].account.displayName,
