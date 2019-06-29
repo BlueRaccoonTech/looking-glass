@@ -74,27 +74,27 @@ class _MyListScreenState extends State {
                         'App designed and created by ',
                     style: TextStyle(color: Colors.black),
                   ),
-                  URLizer.makeURL('Frinkeldoodle', 'https://frinkel.tech',
+                  LookingGlassCustomUI.makeURL('Frinkeldoodle', 'https://frinkel.tech',
                     context),
                   TextSpan(
                     text: '.\n\n'
                         'Crystal ball icon made by ',
                     style: TextStyle(color: Colors.black),
                   ),
-                  URLizer.makeURL('Freepik', 'https://www.freepik.com/',
+                  LookingGlassCustomUI.makeURL('Freepik', 'https://www.freepik.com/',
                     context),
                   TextSpan(
                     text: ' from ',
                     style: TextStyle(color: Colors.black),
                   ),
-                  URLizer.makeURL('flaticon.com', 'https://www.flaticon.com',
+                  LookingGlassCustomUI.makeURL('flaticon.com', 'https://www.flaticon.com',
                       context),
                   TextSpan(
                     text: '\n\n'
                         'Source: ',
                     style: TextStyle(color: Colors.black),
                   ),
-                  URLizer.makeURL('https://git.frinkel.tech/root/looking-glass',
+                  LookingGlassCustomUI.makeURL('https://git.frinkel.tech/root/looking-glass',
                     'https://git.frinkel.tech/root/looking-glass', context),
                   TextSpan(
                     text: '\n\n'
@@ -283,67 +283,11 @@ class _MyListScreenState extends State {
                         ),
                         Padding(
                           padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
-                          child: Row(
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(5, 0, 4, 0),
-                                child: Icon(
-                                  Icons.reply,
-                                  color: Colors.blue,
-                                  size: 30.0,
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(4, 0, 15, 0),
-                                child: Text(
-                                  timeline[index].repliesCount.toString(),
-                                  style: TextStyle(color: Colors.blue),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(15, 0, 4, 0),
-                                child: Icon(
-                                  Icons.record_voice_over,
-                                  color: Colors.green,
-                                  size: 30.0,
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(4, 0, 15, 0),
-                                child: Text(
-                                  timeline[index].reblogsCount.toString(),
-                                  style: TextStyle(color: Colors.green),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(15, 0, 4, 0),
-                                child: Icon(
-                                  Icons.favorite,
-                                  color: Colors.deepPurple,
-                                  size: 30.0,
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(4, 0, 15, 0),
-                                child: Text(
-                                  timeline[index].favouritesCount.toString(),
-                                  style: TextStyle(color: Colors.deepPurple),
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(''),
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.link,
-                                  color: Colors.black,
-                                  size: 30.0,
-                                ),
-                                onPressed: () {
-                                  launch(timeline[index].url);
-                                },
-                              ),
-                            ],
+                          child: LookingGlassCustomUI.interactionBar(
+                            timeline[index].repliesCount,
+                            timeline[index].reblogsCount,
+                            timeline[index].favouritesCount,
+                            timeline[index].url
                           ),
                         ),
                       ],
