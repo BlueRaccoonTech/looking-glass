@@ -149,7 +149,6 @@ class _MyListScreenState extends State {
             ),
             onPressed: () {
               _getUsers();
-              print('Refreshed!');
             },
           ),
         ],
@@ -190,7 +189,6 @@ class _MyListScreenState extends State {
                     onPressed: () {
                       SystemChannels.textInput.invokeMethod('TextInput.hide');
                       if (specifyAnInstance.text != '') {
-                        print(specifyAnInstance.text);
                         targetInstance = specifyAnInstance.text;
                       }
                       _getUsers();
@@ -239,7 +237,9 @@ class _MyListScreenState extends State {
                             ),
                             subtitle: Text(timeline[index].account.acct),
                           )),
-                      Divider(),
+                      Divider(
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
                       Padding(
                         padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
                         child: Visibility(
@@ -258,7 +258,9 @@ class _MyListScreenState extends State {
                         padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
                         child: MarkdownBody(data: timeline[index].content),
                       ),
-                      Divider(),
+                      Divider(
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
                       Padding(
                         padding: EdgeInsets.fromLTRB(24, 8, 24, 20),
                         child: Row(
