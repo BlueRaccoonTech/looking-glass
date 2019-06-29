@@ -216,7 +216,7 @@ class _MyListScreenState extends State {
                   return Card(
                     clipBehavior: Clip.antiAlias,
                     elevation: 0,
-                    color: Colors.white70,
+                    color: Color.fromARGB(210, 255, 255, 255),
                     margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
