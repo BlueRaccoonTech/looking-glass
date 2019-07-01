@@ -70,6 +70,9 @@ class _MyListScreenState extends State {
   @override
   build(context) {
     return Scaffold(
+      /* Y'know what? I don't need a drawer right now.            |
+      But, maybe it'll be convenient when I do more with settings.|
+      -------------------------------------------------------------
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -113,7 +116,7 @@ class _MyListScreenState extends State {
             ),
           ],
         ),
-      ),
+      ),*/
       appBar: AppBar(
         brightness: Brightness.dark,
         backgroundColor: headerColor,
