@@ -36,9 +36,13 @@ class MyListScreen extends StatefulWidget {
 class _MyListScreenState extends State {
   var timeline = new List<Status>();
 
-  _getUsers() {
-    APIConnector.getTimeline().then((response) {
+  _getUsers(int selector) {
+    APIConnector.getTimeline(selector).then((response) {
       setState(() {
+        String UCNavURLs = response.headers["link"];
+        Iterable CleanNavURLs = urlGrabber.allMatches(UCNavURLs);
+        nextURL = CleanNavURLs.elementAt(0).group(0).toString();
+        prevURL = CleanNavURLs.elementAt(1).group(0).toString();
         Iterable list = json.decode(response.body);
         timeline = list.map((model) => Status.fromJson(model)).toList();
       });
@@ -50,12 +54,12 @@ class _MyListScreenState extends State {
     if (specifyAnInstance.text != '') {
       targetInstance = specifyAnInstance.text;
     }
-    _getUsers();
+    _getUsers(0);
   }
 
   initState() {
     super.initState();
-    _getUsers();
+    _getUsers(0);
   }
 
   dispose() {
@@ -92,15 +96,19 @@ class _MyListScreenState extends State {
               ),
             ),
             ListTile(
-              title: Text('Item 1'),
+              title: Text('Next 20'),
               onTap: () {
                 // Update state of the app.
+                _getUsers(1);
+                Navigator.pop(context);
               },
             ),
             ListTile(
-              title: Text('Item 2'),
+              title: Text('Previous 20'),
               onTap: () {
                 // Update state of the app.
+                _getUsers(2);
+                Navigator.pop(context);
               },
             ),
           ],
@@ -119,11 +127,29 @@ class _MyListScreenState extends State {
         actions: <Widget>[
           IconButton(
             icon: Icon(
-              Icons.refresh,
-              semanticLabel: 'Refresh Timeline',
+              Icons.arrow_back,
+              semanticLabel: '20 Newer',
             ),
             onPressed: () {
-              _getUsers();
+              _getUsers(1);
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.arrow_forward,
+              semanticLabel: '20 Older',
+            ),
+            onPressed: () {
+              _getUsers(2);
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.refresh,
+              semanticLabel: 'Refresh Current View',
+            ),
+            onPressed: () {
+              _getUsers(3);
             },
           ),
         ],
@@ -218,18 +244,23 @@ class _MyListScreenState extends State {
                         Divider(
                           color: Color.fromARGB(255, 0, 0, 0),
                         ),
-                        Padding(
+                        InkWell(
+                          child: Padding(
                           padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
                           child: Visibility(
                             visible: timeline[index].subjectText.isNotEmpty,
                             child: Text(
-                              timeline[index].subjectText,
-                              style: TextStyle(
-                                fontStyle: FontStyle.italic,
-                                color: Colors.deepPurple,
+                                timeline[index].subjectText,
+                                style: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.deepPurple,
+                                ),
                               ),
                             ),
                           ),
+                          onTap: () {
+                            // TODO: Show/hide text underneath spoiler
+                          },
                         ),
                         Visibility(
                           visible: timeline[index].subjectText.isNotEmpty,
