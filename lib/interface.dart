@@ -19,54 +19,46 @@ TextSpan makeURL(String linkText, String linkUrl, BuildContext context) {
   );
 }
 
-Row interactionBar(int replies, int boosts, int favs, String url) {
+Widget interactionIcon(int type, int interactionCount) {
+  IconData interactionIcon;
+  Color interactionColor;
+  if (type == 1) {
+    interactionColor = Colors.blue;
+    interactionIcon = Icons.reply;
+  } else if (type == 2) {
+    interactionColor = Colors.green;
+    interactionIcon = Icons.record_voice_over;
+  } else {
+    interactionColor = Colors.deepPurple;
+    interactionIcon = Icons.favorite;
+  }
   return Row(
     children: <Widget>[
       Padding(
         padding: EdgeInsets.fromLTRB(5, 0, 4, 0),
         child: Icon(
-          Icons.reply,
-          color: Colors.blue,
+          interactionIcon,
+          color: interactionColor,
           size: 30.0,
         ),
       ),
       Padding(
         padding: EdgeInsets.fromLTRB(4, 0, 15, 0),
         child: Text(
-          replies.toString(),
-          style: TextStyle(color: Colors.blue),
+          interactionCount.toString(),
+          style: TextStyle(color: interactionColor),
         ),
       ),
-      Padding(
-        padding: EdgeInsets.fromLTRB(15, 0, 4, 0),
-        child: Icon(
-          Icons.record_voice_over,
-          color: Colors.green,
-          size: 30.0,
-        ),
-      ),
-      Padding(
-        padding: EdgeInsets.fromLTRB(4, 0, 15, 0),
-        child: Text(
-          boosts.toString(),
-          style: TextStyle(color: Colors.green),
-        ),
-      ),
-      Padding(
-        padding: EdgeInsets.fromLTRB(15, 0, 4, 0),
-        child: Icon(
-          Icons.favorite,
-          color: Colors.deepPurple,
-          size: 30.0,
-        ),
-      ),
-      Padding(
-        padding: EdgeInsets.fromLTRB(4, 0, 15, 0),
-        child: Text(
-          favs.toString(),
-          style: TextStyle(color: Colors.deepPurple),
-        ),
-      ),
+    ],
+  );
+}
+
+Row interactionBar(int replies, int boosts, int favs, String url) {
+  return Row(
+    children: <Widget>[
+      interactionIcon(1, replies),
+      interactionIcon(2, boosts),
+      interactionIcon(3, favs),
       Expanded(
         child: Text(''),
       ),
