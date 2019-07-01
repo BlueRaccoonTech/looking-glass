@@ -3,6 +3,10 @@ library looking_glass_ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'looking_glass_icons.dart' as AppLogo;
+import 'settings.dart';
+
+final specifyAnInstance = TextEditingController();
 
 TextSpan makeURL(String linkText, String linkUrl, BuildContext context) {
   return TextSpan(
@@ -53,7 +57,7 @@ Widget interactionIcon(int type, int interactionCount) {
   );
 }
 
-Row interactionBar(int replies, int boosts, int favs, String url) {
+Widget interactionBar(int replies, int boosts, int favs, String url) {
   return Row(
     children: <Widget>[
       interactionIcon(1, replies),
@@ -73,5 +77,59 @@ Row interactionBar(int replies, int boosts, int favs, String url) {
         },
       ),
     ],
+  );
+}
+
+void showAbout(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+          title: Row(
+            children: <Widget>[
+              Icon(AppLogo.LookingGlass.crystal_ball),
+              Text("  The Looking Glass"),
+            ],
+          ),
+          content: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: appDescription + '\n\n' + 'App designed and created by ',
+                  style: TextStyle(color: Colors.black),
+                ),
+                makeURL('Frinkeldoodle', 'https://frinkel.tech',
+                    context),
+                TextSpan(
+                  text: '.\n\n'
+                      'Crystal ball icon made by ',
+                  style: TextStyle(color: Colors.black),
+                ),
+                makeURL('Freepik', 'https://www.freepik.com/',
+                    context),
+                TextSpan(
+                  text: ' from ',
+                  style: TextStyle(color: Colors.black),
+                ),
+                makeURL('flaticon.com', 'https://www.flaticon.com',
+                    context),
+                TextSpan(
+                  text: '\n\n'
+                      'Source: ',
+                  style: TextStyle(color: Colors.black),
+                ),
+                makeURL(sourceURL, sourceURL, context),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ]);
+    },
   );
 }

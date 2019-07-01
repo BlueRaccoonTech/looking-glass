@@ -1,10 +1,3 @@
-/// Hello there!
-/// I hope you don't mind my mess of a "main" file!
-/// This app was honestly the work of one late night and one all-nighter.
-/// (yes, I'm actually running on zero sleep right now.)
-/// (I blame the fact I somehow work really well when I'm under pressure and
-/// heavy time constraints, in the middle of the night. ^^")
-
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +6,7 @@ import 'dart:convert';
 import 'mstdn_status.dart';
 import 'mstdn_api.dart';
 import 'interface.dart';
+import 'settings.dart';
 
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -41,11 +35,9 @@ class MyListScreen extends StatefulWidget {
 
 class _MyListScreenState extends State {
   var timeline = new List<Status>();
-  String targetInstance = "mastodon.social";
-  final specifyAnInstance = TextEditingController();
 
   _getUsers() {
-    APIConnector.getTimeline(targetInstance).then((response) {
+    APIConnector.getTimeline().then((response) {
       setState(() {
         Iterable list = json.decode(response.body);
         timeline = list.map((model) => Status.fromJson(model)).toList();
@@ -53,62 +45,12 @@ class _MyListScreenState extends State {
     });
   }
 
-  void _showDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-            title: Row(
-              children: <Widget>[
-                Icon(AppLogo.LookingGlass.crystal_ball),
-                Text("  The Looking Glass"),
-              ],
-            ),
-            content: RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: 'A reconnaissance tool for quickly displaying public '
-                        'posts from any social media website compatible with the '
-                        'Mastodon API.\n\n'
-                        'App designed and created by ',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                  makeURL('Frinkeldoodle', 'https://frinkel.tech',
-                    context),
-                  TextSpan(
-                    text: '.\n\n'
-                        'Crystal ball icon made by ',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                  makeURL('Freepik', 'https://www.freepik.com/',
-                    context),
-                  TextSpan(
-                    text: ' from ',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                  makeURL('flaticon.com', 'https://www.flaticon.com',
-                      context),
-                  TextSpan(
-                    text: '\n\n'
-                        'Source: ',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                  makeURL('https://git.frinkel.tech/root/looking-glass',
-                    'https://git.frinkel.tech/root/looking-glass', context),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              new FlatButton(
-                child: new Text("Close"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ]);
-      },
-    );
+  updateInstance() {
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+    if (specifyAnInstance.text != '') {
+      targetInstance = specifyAnInstance.text;
+    }
+    _getUsers();
   }
 
   initState() {
@@ -124,13 +66,53 @@ class _MyListScreenState extends State {
   @override
   build(context) {
     return Scaffold(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(
+                    AppLogo.LookingGlass.crystal_ball,
+                    color: Colors.white,
+                  ),
+                  Text(
+                    "   The Looking Glass",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                  ),
+                ],
+              ),
+              decoration: BoxDecoration(
+                color: headerColor,
+              ),
+            ),
+            ListTile(
+              title: Text('Item 1'),
+              onTap: () {
+                // Update state of the app.
+              },
+            ),
+            ListTile(
+              title: Text('Item 2'),
+              onTap: () {
+                // Update state of the app.
+              },
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         brightness: Brightness.dark,
-        backgroundColor: Colors.black54,
+        backgroundColor: headerColor,
         leading: IconButton(
           icon: Icon(AppLogo.LookingGlass.crystal_ball),
           onPressed: () {
-            _showDialog();
+            showAbout(context);
           },
         ),
         title: Text("The Looking Glass"),
@@ -179,11 +161,7 @@ class _MyListScreenState extends State {
                   child: IconButton(
                     icon: Icon(Icons.forward),
                     onPressed: () {
-                      SystemChannels.textInput.invokeMethod('TextInput.hide');
-                      if (specifyAnInstance.text != '') {
-                        targetInstance = specifyAnInstance.text;
-                      }
-                      _getUsers();
+                      updateInstance();
                     },
                   ),
                 ),
@@ -247,8 +225,8 @@ class _MyListScreenState extends State {
                             child: Text(
                               timeline[index].subjectText,
                               style: TextStyle(
-                                  fontStyle: FontStyle.italic,
-                                  color: Colors.deepPurple,
+                                fontStyle: FontStyle.italic,
+                                color: Colors.deepPurple,
                               ),
                             ),
                           ),
@@ -269,11 +247,10 @@ class _MyListScreenState extends State {
                         Padding(
                           padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
                           child: interactionBar(
-                            timeline[index].repliesCount,
-                            timeline[index].reblogsCount,
-                            timeline[index].favouritesCount,
-                            timeline[index].url
-                          ),
+                              timeline[index].repliesCount,
+                              timeline[index].reblogsCount,
+                              timeline[index].favouritesCount,
+                              timeline[index].url),
                         ),
                       ],
                     ),
