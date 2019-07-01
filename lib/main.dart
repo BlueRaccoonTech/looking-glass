@@ -74,27 +74,27 @@ class _MyListScreenState extends State {
                         'App designed and created by ',
                     style: TextStyle(color: Colors.black),
                   ),
-                  LookingGlassCustomUI.makeURL('Frinkeldoodle', 'https://frinkel.tech',
+                  makeURL('Frinkeldoodle', 'https://frinkel.tech',
                     context),
                   TextSpan(
                     text: '.\n\n'
                         'Crystal ball icon made by ',
                     style: TextStyle(color: Colors.black),
                   ),
-                  LookingGlassCustomUI.makeURL('Freepik', 'https://www.freepik.com/',
+                  makeURL('Freepik', 'https://www.freepik.com/',
                     context),
                   TextSpan(
                     text: ' from ',
                     style: TextStyle(color: Colors.black),
                   ),
-                  LookingGlassCustomUI.makeURL('flaticon.com', 'https://www.flaticon.com',
+                  makeURL('flaticon.com', 'https://www.flaticon.com',
                       context),
                   TextSpan(
                     text: '\n\n'
                         'Source: ',
                     style: TextStyle(color: Colors.black),
                   ),
-                  LookingGlassCustomUI.makeURL('https://git.frinkel.tech/root/looking-glass',
+                  makeURL('https://git.frinkel.tech/root/looking-glass',
                     'https://git.frinkel.tech/root/looking-glass', context),
                 ],
               ),
@@ -268,7 +268,7 @@ class _MyListScreenState extends State {
                         ),
                         Padding(
                           padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
-                          child: LookingGlassCustomUI.interactionBar(
+                          child: interactionBar(
                             timeline[index].repliesCount,
                             timeline[index].reblogsCount,
                             timeline[index].favouritesCount,
