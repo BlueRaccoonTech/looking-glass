@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/scheduler.dart';
 
 import 'dart:convert';
 import 'mstdn_status.dart';
@@ -9,6 +10,7 @@ import 'interface.dart';
 import 'settings.dart';
 
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'looking_glass_icons.dart' as AppLogo;
@@ -35,8 +37,12 @@ class MyListScreen extends StatefulWidget {
 
 class _MyListScreenState extends State {
   var timeline = new List<Status>();
+  ProgressDialog uiLoadingTL;
 
-  _getUsers(int selector) {
+  _fetchTimeline(int selector) {
+    uiLoadingTL = new ProgressDialog(context, ProgressDialogType.Normal);
+    uiLoadingTL.setMessage("Fetching " + targetInstance + " timeline...");
+    uiLoadingTL.show();
     APIConnector.getTimeline(selector).then((response) {
       setState(() {
         String UCNavURLs = response.headers["link"];
@@ -45,6 +51,7 @@ class _MyListScreenState extends State {
         prevURL = CleanNavURLs.elementAt(1).group(0).toString();
         Iterable list = json.decode(response.body);
         timeline = list.map((model) => Status.fromJson(model)).toList();
+        uiLoadingTL.hide();
       });
     });
   }
@@ -54,12 +61,12 @@ class _MyListScreenState extends State {
     if (specifyAnInstance.text != '') {
       targetInstance = specifyAnInstance.text;
     }
-    _getUsers(0);
+    _fetchTimeline(0);
   }
 
   initState() {
     super.initState();
-    _getUsers(0);
+    SchedulerBinding.instance.addPostFrameCallback((_) => _fetchTimeline(0));
   }
 
   dispose() {
@@ -134,7 +141,7 @@ class _MyListScreenState extends State {
               semanticLabel: '20 Newer',
             ),
             onPressed: () {
-              _getUsers(1);
+              _fetchTimeline(1);
             },
           ),
           IconButton(
@@ -143,7 +150,7 @@ class _MyListScreenState extends State {
               semanticLabel: '20 Older',
             ),
             onPressed: () {
-              _getUsers(2);
+              _fetchTimeline(2);
             },
           ),
           IconButton(
@@ -152,7 +159,7 @@ class _MyListScreenState extends State {
               semanticLabel: 'Refresh Current View',
             ),
             onPressed: () {
-              _getUsers(3);
+              _fetchTimeline(3);
             },
           ),
         ],
