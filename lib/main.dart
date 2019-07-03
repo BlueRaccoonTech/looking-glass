@@ -280,7 +280,10 @@ class _MyListScreenState extends State {
                         ),
                         Padding(
                           padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-                          child: MarkdownBody(data: timeline[index].content),
+                          child: MarkdownBody(
+                              data: timeline[index].content,
+                              onTapLink: (href) {launch(href);},
+                          ),
                         ),
                         Divider(
                           color: Color.fromARGB(255, 0, 0, 0),
