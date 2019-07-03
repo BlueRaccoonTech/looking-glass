@@ -23,13 +23,14 @@ class Status {
   final String visibility;
   final String language;
   final bool pinned;
+  bool isInvisible;
 
   Status({this.id, this.url, this.account, this.inReplyToId,
     this.inReplyToAccountId, this.reblog, this.content,
     this.createdAt, this.repliesCount, this.reblogsCount,
     this.favouritesCount, this.reblogged, this.favourited,
     this.muted, this.sensitive, this.subjectText,
-    this.visibility, this.language, this.pinned});
+    this.visibility, this.language, this.pinned, this.isInvisible});
 
   factory Status.fromJson(Map<String, dynamic> parsedJson) {
     Account tempAccount = Account.fromJson(parsedJson['account']);
@@ -57,7 +58,8 @@ class Status {
       subjectText: parsedJson['spoiler_text'],
       visibility: parsedJson['visibility'],
       language: parsedJson['language'],
-      pinned: parsedJson['pinned']
+      pinned: parsedJson['pinned'],
+      isInvisible: !parsedJson['spoiler_text'].isNotEmpty,
     );
   }
 }

@@ -38,6 +38,7 @@ class MyListScreen extends StatefulWidget {
 class _MyListScreenState extends State {
   var timeline = new List<Status>();
   ProgressDialog uiLoadingTL;
+  ScrollController _plzScrollForMe;
 
   _fetchTimeline(int selector) {
     uiLoadingTL = new ProgressDialog(context, ProgressDialogType.Normal);
@@ -62,21 +63,33 @@ class _MyListScreenState extends State {
       targetInstance = specifyAnInstance.text;
     }
     _fetchTimeline(0);
+    _scrollToTop();
+  }
+
+  _scrollToTop() {
+    _plzScrollForMe.animateTo(_plzScrollForMe.position.minScrollExtent,
+        duration: Duration(milliseconds: 1000), curve: Curves.easeIn);
   }
 
   initState() {
     super.initState();
+    _plzScrollForMe = ScrollController();
     SchedulerBinding.instance.addPostFrameCallback((_) => _fetchTimeline(0));
   }
 
   dispose() {
     specifyAnInstance.dispose();
+    _plzScrollForMe.dispose();
     super.dispose();
   }
 
   @override
   build(context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: _scrollToTop,
+        child: Icon(Icons.arrow_upward),
+      ),
       /* Y'know what? I don't need a drawer right now.            |
       But, maybe it'll be convenient when I do more with settings.|
       -------------------------------------------------------------
@@ -142,6 +155,7 @@ class _MyListScreenState extends State {
             ),
             onPressed: () {
               _fetchTimeline(1);
+              _scrollToTop();
             },
           ),
           IconButton(
@@ -151,6 +165,7 @@ class _MyListScreenState extends State {
             ),
             onPressed: () {
               _fetchTimeline(2);
+              _scrollToTop();
             },
           ),
           IconButton(
@@ -160,6 +175,7 @@ class _MyListScreenState extends State {
             ),
             onPressed: () {
               _fetchTimeline(3);
+              _scrollToTop();
             },
           ),
         ],
@@ -221,6 +237,7 @@ class _MyListScreenState extends State {
                 ),
               ),
               child: ListView.builder(
+                controller: _plzScrollForMe,
                 itemCount: timeline.length,
                 itemBuilder: (context, index) {
                   return Card(
@@ -269,7 +286,14 @@ class _MyListScreenState extends State {
                             ),
                           ),
                           onTap: () {
-                            // TODO: Show/hide text underneath spoiler
+
+                            setState(() {
+                              if (timeline[index].isInvisible == false) {
+                                timeline[index].isInvisible = true;
+                              } else {
+                                timeline[index].isInvisible = false;
+                              }
+                            });
                           },
                         ),
                         Visibility(
@@ -278,11 +302,14 @@ class _MyListScreenState extends State {
                             color: Color.fromARGB(255, 0, 0, 0),
                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-                          child: MarkdownBody(
+                        Visibility(
+                          visible: timeline[index].isInvisible,
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                            child: MarkdownBody(
                               data: timeline[index].content,
                               onTapLink: (href) {launch(href);},
+                            ),
                           ),
                         ),
                         Divider(
