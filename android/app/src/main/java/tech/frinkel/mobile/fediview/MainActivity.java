@@ -1,4 +1,4 @@
-package tech.frinkel.mobile.tftown_viewer;
+package tech.frinkel.mobile.fediview;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;
