@@ -43,6 +43,7 @@ class _MyListScreenState extends State {
   Instance targetInstanceInfo;
   bool tlFetchInProgress = false;
   bool infoFetchInProgress = false;
+  GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey<RefreshIndicatorState>();
 
   _fetchTimeline(int selector) async {
     tlFetchInProgress = true;
@@ -93,117 +94,124 @@ class _MyListScreenState extends State {
         duration: Duration(milliseconds: 1000), curve: Curves.easeIn);
   }
 
+  Future<void> _refreshTimeline() async {
+    _fetchTimeline(3);
+  }
+
   Widget timelineViewer() {
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Colors.blueGrey,
-            Colors.black87,
-          ],
-        ),
-      ),
-      child: ListView.builder(
-        controller: _plzScrollForMe,
-        itemCount: timeline.length,
-        itemBuilder: (context, index) {
-          return Card(
-            clipBehavior: Clip.antiAlias,
-            elevation: 0,
-            color: Color.fromARGB(210, 255, 255, 255),
-            margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                    padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
-                    child: ListTile(
-                      leading: Image.network(timeline[index].account.avatar),
-                      title: RichText(
-                        text: TextSpan(
-                          text: timeline[index].account.displayName,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              launch(timeline[index].account.url);
-                            },
-                        ),
-                      ),
-                      subtitle: Text(timeline[index].createdAt),
-                    )),
-                Divider(
-                  height: 0,
-                  color: Color.fromARGB(255, 0, 0, 0),
-                ),
-                Container(
-                  child: InkWell(
-                    child: Visibility(
-                      visible: timeline[index].subjectText.isNotEmpty,
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
-                        child: Text(
-                          timeline[index].subjectText,
-                          style: TextStyle(
-                            fontStyle: FontStyle.italic,
-                            color: Colors.deepPurple,
-                          ),
-                        ),
-                      ),
-                    ),
-                    onTap: () {
-                      setState(() {
-                        if (timeline[index].isInvisible == false) {
-                          timeline[index].isInvisible = true;
-                        } else {
-                          timeline[index].isInvisible = false;
-                        }
-                      });
-                    },
-                  ),
-                ),
-
-                Visibility(
-                  visible: timeline[index].subjectText.isNotEmpty,
-                  child: Divider(
-                    height: 0,
-                    color: Color.fromARGB(255, 0, 0, 0),
-                  ),
-                ),
-                Visibility(
-                  visible: timeline[index].isInvisible,
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
-                    child: MarkdownBody(
-                      data: timeline[index].content,
-                      onTapLink: (href) {
-                        launch(href);
-                      },
-                    ),
-                  ),
-                ),
-                Divider(
-                  height: 0,
-                  color: Color.fromARGB(255, 0, 0, 0),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
-                  child: interactionBar(
-                      timeline[index].repliesCount,
-                      timeline[index].reblogsCount,
-                      timeline[index].favouritesCount,
-                      timeline[index].url),
-                ),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.blueGrey,
+                Colors.black87,
               ],
             ),
-          );
-        },
-      ),
-    );
+          ),
+          child: RefreshIndicator(
+            child: ListView.builder(
+              controller: _plzScrollForMe,
+              itemCount: timeline.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  clipBehavior: Clip.antiAlias,
+                  elevation: 0,
+                  color: Color.fromARGB(210, 255, 255, 255),
+                  margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                          padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
+                          child: ListTile(
+                            leading:
+                            Image.network(timeline[index].account.avatar),
+                            title: RichText(
+                              text: TextSpan(
+                                text: timeline[index].account.displayName,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    launch(timeline[index].account.url);
+                                  },
+                              ),
+                            ),
+                            subtitle: Text(timeline[index].createdAt),
+                          )),
+                      Divider(
+                        height: 0,
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
+                      Container(
+                        child: InkWell(
+                          child: Visibility(
+                            visible: timeline[index].subjectText.isNotEmpty,
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+                              child: Text(
+                                timeline[index].subjectText,
+                                style: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.deepPurple,
+                                ),
+                              ),
+                            ),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              if (timeline[index].isInvisible == false) {
+                                timeline[index].isInvisible = true;
+                              } else {
+                                timeline[index].isInvisible = false;
+                              }
+                            });
+                          },
+                        ),
+                      ),
+                      Visibility(
+                        visible: timeline[index].subjectText.isNotEmpty,
+                        child: Divider(
+                          height: 0,
+                          color: Color.fromARGB(255, 0, 0, 0),
+                        ),
+                      ),
+                      Visibility(
+                        visible: timeline[index].isInvisible,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+                          child: MarkdownBody(
+                            data: timeline[index].content,
+                            onTapLink: (href) {
+                              launch(href);
+                            },
+                          ),
+                        ),
+                      ),
+                      Divider(
+                        height: 0,
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
+                        child: interactionBar(
+                            timeline[index].repliesCount,
+                            timeline[index].reblogsCount,
+                            timeline[index].favouritesCount,
+                            timeline[index].url),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            onRefresh: _refreshTimeline,
+          ),
+        );
   }
 
   Widget instanceInfo() {
@@ -222,7 +230,7 @@ class _MyListScreenState extends State {
         color: Color.fromARGB(230, 255, 255, 255),
         margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
         child: Padding(
-          padding: EdgeInsets.fromLTRB(20,20,20,20),
+          padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -250,14 +258,17 @@ class _MyListScreenState extends State {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-
                 children: <Widget>[
                   FlatButton(
                     onPressed: null,
                     child: Column(
                       children: <Widget>[
                         Icon(Icons.person, color: Colors.blue),
-                        Text("Users: \n" + (targetInstanceInfo?.stats?.userCount.toString() ?? "0"),
+                        Text(
+                          "Users: \n" +
+                              (targetInstanceInfo?.stats?.userCount
+                                      .toString() ??
+                                  "0"),
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.blue),
                         ),
@@ -269,7 +280,11 @@ class _MyListScreenState extends State {
                     child: Column(
                       children: <Widget>[
                         Icon(Icons.message, color: Colors.green),
-                        Text("Posts: \n" + (targetInstanceInfo?.stats?.statusCount.toString() ?? "0"),
+                        Text(
+                          "Posts: \n" +
+                              (targetInstanceInfo?.stats?.statusCount
+                                      .toString() ??
+                                  "0"),
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.green),
                         ),
@@ -281,7 +296,11 @@ class _MyListScreenState extends State {
                     child: Column(
                       children: <Widget>[
                         Icon(Icons.cloud, color: Colors.black),
-                        Text("Peers: \n" + (targetInstanceInfo?.stats?.peerCount.toString() ?? "0"),
+                        Text(
+                          "Peers: \n" +
+                              (targetInstanceInfo?.stats?.peerCount
+                                      .toString() ??
+                                  "0"),
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.black),
                         ),
@@ -301,7 +320,10 @@ class _MyListScreenState extends State {
                     child: Column(
                       children: <Widget>[
                         Icon(Icons.spellcheck, color: Colors.deepPurple),
-                        Text("Max Post\nLength: " + (targetInstanceInfo?.postLength.toString() ?? "500"),
+                        Text(
+                          "Max Post\nLength: " +
+                              (targetInstanceInfo?.postLength.toString() ??
+                                  "500"),
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.deepPurple),
                         ),
@@ -310,7 +332,6 @@ class _MyListScreenState extends State {
                   ),
                 ],
               ),
-
               Divider(
                 height: 32,
                 color: Color.fromARGB(255, 0, 0, 0),
@@ -325,7 +346,8 @@ class _MyListScreenState extends State {
   initState() {
     super.initState();
     _plzScrollForMe = ScrollController();
-    SchedulerBinding.instance.addPostFrameCallback((_) => uiLoadingTL = new ProgressDialog(context, ProgressDialogType.Normal));
+    SchedulerBinding.instance.addPostFrameCallback((_) =>
+        uiLoadingTL = new ProgressDialog(context, ProgressDialogType.Normal));
     SchedulerBinding.instance.addPostFrameCallback((_) => _fetchInstanceInfo());
     SchedulerBinding.instance.addPostFrameCallback((_) => _fetchTimeline(0));
   }
@@ -341,17 +363,19 @@ class _MyListScreenState extends State {
     return MaterialApp(
       home: DefaultTabController(
         length: 2,
-        initialIndex: 0,
+        initialIndex: 1,
         child: Scaffold(
           bottomNavigationBar: ColoredTabBar(
             Colors.black87,
             TabBar(
               tabs: [
                 Tab(
-                  icon: Icon(Icons.list),
+                  icon: Icon(Icons.info_outline),
+                  //text: "Instance Info",
                 ),
                 Tab(
-                  icon: Icon(Icons.info_outline),
+                  icon: Icon(Icons.list),
+                  //text: "Public Timeline"
                 ),
               ],
             ),
@@ -452,8 +476,8 @@ class _MyListScreenState extends State {
               Expanded(
                 child: TabBarView(
                   children: [
-                    timelineViewer(),
                     instanceInfo(),
+                    timelineViewer(),
                   ],
                 ),
               ),
