@@ -41,9 +41,11 @@ class _MyListScreenState extends State {
   ProgressDialog uiLoadingTL;
   ScrollController _plzScrollForMe;
   Instance targetInstanceInfo;
+  bool tlFetchInProgress = false;
+  bool infoFetchInProgress = false;
 
   _fetchTimeline(int selector) async {
-    uiLoadingTL = new ProgressDialog(context, ProgressDialogType.Normal);
+    tlFetchInProgress = true;
     uiLoadingTL.setMessage("Loading " + targetInstance + "...");
     uiLoadingTL.show();
     await APIConnector.getTimeline(selector).then((response) {
@@ -54,17 +56,24 @@ class _MyListScreenState extends State {
         prevURL = CleanNavURLs.elementAt(1).group(0).toString();
         Iterable list = json.decode(response.body);
         timeline = list.map((model) => Status.fromJson(model)).toList();
-        uiLoadingTL.hide();
+        if (!infoFetchInProgress && uiLoadingTL.isShowing()) {
+          uiLoadingTL.hide();
+        }
+        tlFetchInProgress = false;
       });
     });
   }
 
   _fetchInstanceInfo() async {
+    infoFetchInProgress = true;
     uiLoadingTL.show();
     await APIConnector.getInformation().then((response) {
       setState(() {
         targetInstanceInfo = Instance.fromJson(json.decode(response.body));
-        uiLoadingTL.hide();
+        if (!tlFetchInProgress && uiLoadingTL.isShowing()) {
+          uiLoadingTL.hide();
+        }
+        infoFetchInProgress = false;
       });
     });
   }
@@ -74,8 +83,8 @@ class _MyListScreenState extends State {
     if (specifyAnInstance.text != '') {
       targetInstance = specifyAnInstance.text;
     }
-    _fetchTimeline(0);
     _fetchInstanceInfo();
+    _fetchTimeline(0);
     _scrollToTop();
   }
 
@@ -282,6 +291,27 @@ class _MyListScreenState extends State {
                 ],
               ),
               Divider(
+                color: Color.fromARGB(0, 0, 0, 0),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  FlatButton(
+                    onPressed: null,
+                    child: Column(
+                      children: <Widget>[
+                        Icon(Icons.spellcheck, color: Colors.deepPurple),
+                        Text("Max Post\nLength: " + (targetInstanceInfo?.postLength.toString() ?? "500"),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.deepPurple),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              Divider(
                 height: 32,
                 color: Color.fromARGB(255, 0, 0, 0),
               ),
@@ -295,8 +325,9 @@ class _MyListScreenState extends State {
   initState() {
     super.initState();
     _plzScrollForMe = ScrollController();
-    SchedulerBinding.instance.addPostFrameCallback((_) => _fetchTimeline(0));
+    SchedulerBinding.instance.addPostFrameCallback((_) => uiLoadingTL = new ProgressDialog(context, ProgressDialogType.Normal));
     SchedulerBinding.instance.addPostFrameCallback((_) => _fetchInstanceInfo());
+    SchedulerBinding.instance.addPostFrameCallback((_) => _fetchTimeline(0));
   }
 
   dispose() {

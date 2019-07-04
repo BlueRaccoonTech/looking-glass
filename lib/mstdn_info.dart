@@ -26,10 +26,11 @@ class Instance {
   final InstanceStats stats;
   final bool regOpen;
   final String thumbnail;
+  final int postLength;
 
 
   Instance({this.uri, this.title, this.description, this.email,
-    this.version, this.stats, this.regOpen, this.thumbnail});
+    this.version, this.stats, this.regOpen, this.thumbnail, this.postLength});
 
   factory Instance.fromJson(Map<String, dynamic> parsedJson){
     InstanceStats instNums = InstanceStats.fromJson(parsedJson['stats']);
@@ -42,6 +43,7 @@ class Instance {
       stats: instNums,
       regOpen: parsedJson['registrations'],
       thumbnail: parsedJson['thumbnail'],
+      postLength: parsedJson['max_toot_chars'] ?? 500,
     );
   }
 }
