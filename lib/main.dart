@@ -42,11 +42,11 @@ class _MyListScreenState extends State {
   ScrollController _plzScrollForMe;
   Instance targetInstanceInfo;
 
-  _fetchTimeline(int selector) {
+  _fetchTimeline(int selector) async {
     uiLoadingTL = new ProgressDialog(context, ProgressDialogType.Normal);
     uiLoadingTL.setMessage("Loading " + targetInstance + "...");
     uiLoadingTL.show();
-    APIConnector.getTimeline(selector).then((response) {
+    await APIConnector.getTimeline(selector).then((response) {
       setState(() {
         String UCNavURLs = response.headers["link"];
         Iterable CleanNavURLs = urlGrabber.allMatches(UCNavURLs);
@@ -59,9 +59,9 @@ class _MyListScreenState extends State {
     });
   }
 
-  _fetchInstanceInfo() {
+  _fetchInstanceInfo() async {
     uiLoadingTL.show();
-    APIConnector.getInformation().then((response) {
+    await APIConnector.getInformation().then((response) {
       setState(() {
         targetInstanceInfo = Instance.fromJson(json.decode(response.body));
         uiLoadingTL.hide();
@@ -198,32 +198,96 @@ class _MyListScreenState extends State {
   }
 
   Widget instanceInfo() {
-    //return Text("To Be Implemented");
-    return Padding(
-      padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          RichText(
-            text: TextSpan(
-              text: targetInstanceInfo.title,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.blueAccent,
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.blueGrey,
+            Colors.black87,
+          ],
+        ),
+      ),
+      child: Card(
+        color: Color.fromARGB(230, 255, 255, 255),
+        margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(20,20,20,20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              RichText(
+                text: TextSpan(
+                  text: targetInstanceInfo?.title ?? "Untitled Instance",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
               ),
-            ),
+              Divider(
+                color: Color.fromARGB(255, 0, 0, 0),
+              ),
+              MarkdownBody(
+                data: targetInstanceInfo?.description ?? "Track 1",
+                onTapLink: (href) {
+                  launch(href);
+                },
+              ),
+              Divider(
+                color: Color.fromARGB(0, 0, 0, 0),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+
+                children: <Widget>[
+                  FlatButton(
+                    onPressed: null,
+                    child: Column(
+                      children: <Widget>[
+                        Icon(Icons.person, color: Colors.blue),
+                        Text("Users: \n" + (targetInstanceInfo?.stats?.userCount.toString() ?? "0"),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      ],
+                    ),
+                  ),
+                  FlatButton(
+                    onPressed: null,
+                    child: Column(
+                      children: <Widget>[
+                        Icon(Icons.message, color: Colors.green),
+                        Text("Posts: \n" + (targetInstanceInfo?.stats?.statusCount.toString() ?? "0"),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.green),
+                        ),
+                      ],
+                    ),
+                  ),
+                  FlatButton(
+                    onPressed: null,
+                    child: Column(
+                      children: <Widget>[
+                        Icon(Icons.cloud, color: Colors.black),
+                        Text("Peers: \n" + (targetInstanceInfo?.stats?.peerCount.toString() ?? "0"),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              Divider(
+                height: 32,
+                color: Color.fromARGB(255, 0, 0, 0),
+              ),
+            ],
           ),
-          Divider(
-            color: Color.fromARGB(255, 0, 0, 0),
-          ),
-          MarkdownBody(
-            data: targetInstanceInfo.description,
-            onTapLink: (href) {
-              launch(href);
-            },
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -253,10 +317,10 @@ class _MyListScreenState extends State {
             TabBar(
               tabs: [
                 Tab(
-                  icon: Icon(Icons.info_outline),
+                  icon: Icon(Icons.list),
                 ),
                 Tab(
-                  icon: Icon(Icons.list),
+                  icon: Icon(Icons.info_outline),
                 ),
               ],
             ),
@@ -357,8 +421,8 @@ class _MyListScreenState extends State {
               Expanded(
                 child: TabBarView(
                   children: [
-                    instanceInfo(),
                     timelineViewer(),
+                    instanceInfo(),
                   ],
                 ),
               ),
