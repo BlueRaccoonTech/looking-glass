@@ -6,6 +6,7 @@ import 'package:flutter/scheduler.dart';
 import 'dart:convert';
 import 'mstdn_status.dart';
 import 'mstdn_api.dart';
+import 'mstdn_info.dart';
 import 'interface.dart';
 import 'settings.dart';
 
@@ -39,6 +40,7 @@ class _MyListScreenState extends State {
   var timeline = new List<Status>();
   ProgressDialog uiLoadingTL;
   ScrollController _plzScrollForMe;
+  Instance targetInstanceInfo;
 
   _fetchTimeline(int selector) {
     uiLoadingTL = new ProgressDialog(context, ProgressDialogType.Normal);
@@ -57,12 +59,23 @@ class _MyListScreenState extends State {
     });
   }
 
+  _fetchInstanceInfo() {
+    uiLoadingTL.show();
+    APIConnector.getInformation().then((response) {
+      setState(() {
+        targetInstanceInfo = Instance.fromJson(json.decode(response.body));
+        uiLoadingTL.hide();
+      });
+    });
+  }
+
   updateInstance() {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
     if (specifyAnInstance.text != '') {
       targetInstance = specifyAnInstance.text;
     }
     _fetchTimeline(0);
+    _fetchInstanceInfo();
     _scrollToTop();
   }
 
@@ -98,8 +111,7 @@ class _MyListScreenState extends State {
                 Padding(
                     padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
                     child: ListTile(
-                      leading:
-                      Image.network(timeline[index].account.avatar),
+                      leading: Image.network(timeline[index].account.avatar),
                       title: RichText(
                         text: TextSpan(
                           text: timeline[index].account.displayName,
@@ -116,50 +128,57 @@ class _MyListScreenState extends State {
                       subtitle: Text(timeline[index].createdAt),
                     )),
                 Divider(
+                  height: 0,
                   color: Color.fromARGB(255, 0, 0, 0),
                 ),
-                InkWell(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                Container(
+                  child: InkWell(
                     child: Visibility(
                       visible: timeline[index].subjectText.isNotEmpty,
-                      child: Text(
-                        timeline[index].subjectText,
-                        style: TextStyle(
-                          fontStyle: FontStyle.italic,
-                          color: Colors.deepPurple,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+                        child: Text(
+                          timeline[index].subjectText,
+                          style: TextStyle(
+                            fontStyle: FontStyle.italic,
+                            color: Colors.deepPurple,
+                          ),
                         ),
                       ),
                     ),
+                    onTap: () {
+                      setState(() {
+                        if (timeline[index].isInvisible == false) {
+                          timeline[index].isInvisible = true;
+                        } else {
+                          timeline[index].isInvisible = false;
+                        }
+                      });
+                    },
                   ),
-                  onTap: () {
-
-                    setState(() {
-                      if (timeline[index].isInvisible == false) {
-                        timeline[index].isInvisible = true;
-                      } else {
-                        timeline[index].isInvisible = false;
-                      }
-                    });
-                  },
                 ),
+
                 Visibility(
                   visible: timeline[index].subjectText.isNotEmpty,
                   child: Divider(
+                    height: 0,
                     color: Color.fromARGB(255, 0, 0, 0),
                   ),
                 ),
                 Visibility(
                   visible: timeline[index].isInvisible,
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                    padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
                     child: MarkdownBody(
                       data: timeline[index].content,
-                      onTapLink: (href) {launch(href);},
+                      onTapLink: (href) {
+                        launch(href);
+                      },
                     ),
                   ),
                 ),
                 Divider(
+                  height: 0,
                   color: Color.fromARGB(255, 0, 0, 0),
                 ),
                 Padding(
@@ -179,14 +198,41 @@ class _MyListScreenState extends State {
   }
 
   Widget instanceInfo() {
-    /// TO BE IMPLEMENTED
-    return Text("To Be Implemented");
+    //return Text("To Be Implemented");
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          RichText(
+            text: TextSpan(
+              text: targetInstanceInfo.title,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueAccent,
+              ),
+            ),
+          ),
+          Divider(
+            color: Color.fromARGB(255, 0, 0, 0),
+          ),
+          MarkdownBody(
+            data: targetInstanceInfo.description,
+            onTapLink: (href) {
+              launch(href);
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   initState() {
     super.initState();
     _plzScrollForMe = ScrollController();
     SchedulerBinding.instance.addPostFrameCallback((_) => _fetchTimeline(0));
+    SchedulerBinding.instance.addPostFrameCallback((_) => _fetchInstanceInfo());
   }
 
   dispose() {
@@ -200,21 +246,21 @@ class _MyListScreenState extends State {
     return MaterialApp(
       home: DefaultTabController(
         length: 2,
-        initialIndex: 1,
+        initialIndex: 0,
         child: Scaffold(
           bottomNavigationBar: ColoredTabBar(
-          Colors.black87,
-          TabBar(
-            tabs: [
-              Tab(
-                icon: Icon(Icons.info_outline),
-              ),
-              Tab(
-                icon: Icon(Icons.list),
-              ),
-            ],
+            Colors.black87,
+            TabBar(
+              tabs: [
+                Tab(
+                  icon: Icon(Icons.info_outline),
+                ),
+                Tab(
+                  icon: Icon(Icons.list),
+                ),
+              ],
+            ),
           ),
-        ),
           floatingActionButton: FloatingActionButton(
             onPressed: _scrollToTop,
             child: Icon(Icons.arrow_upward),
