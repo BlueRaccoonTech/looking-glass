@@ -18,4 +18,8 @@ class APIConnector {
     }
     return http.get(latestURL);
   }
+  static Future getInformation() {
+    instanceInfo = protocol + targetInstance + apiURL + instanceInfoPath;
+    return http.get(instanceInfo);
+  }
 }
