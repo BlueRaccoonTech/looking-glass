@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
 import 'settings.dart';
 
 class APIConnector {
-  static Future getTimeline(int selector) {
+  static Future getTimeline(int selector, IOClient client) {
     if (selector == 0) {
       String urlOptions = "?maxPosts=" + maxPosts.toString();
       if (localOnly) {
@@ -16,10 +16,10 @@ class APIConnector {
     } else if (selector == 2) {
       latestURL = prevURL;
     }
-    return http.get(latestURL);
+    return client.get(latestURL);
   }
-  static Future getInformation() {
+  static Future getInformation(IOClient client) {
     instanceInfo = protocol + targetInstance + apiURL + instanceInfoPath;
-    return http.get(instanceInfo);
+    return client.get(instanceInfo);
   }
 }

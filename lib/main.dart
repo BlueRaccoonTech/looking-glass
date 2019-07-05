@@ -14,6 +14,7 @@ import 'settings.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/io_client.dart';
 
 import 'looking_glass_icons.dart' as AppLogo;
 
@@ -45,6 +46,7 @@ class _MyListScreenState extends State {
   bool tlFetchInProgress = false;
   bool infoFetchInProgress = false;
   bool scrollToTopVisible = false;
+  IOClient legitHTTP = new IOClient();
   final errorSnackBar = SnackBar(
       content: Text(errorFetching,
           textAlign: TextAlign.center,
@@ -72,7 +74,7 @@ class _MyListScreenState extends State {
     tlFetchInProgress = true;
     uiLoadingTL.setMessage("Loading " + targetInstance + "...");
     uiLoadingTL.show();
-    await APIConnector.getTimeline(selector).then((response) {
+    await APIConnector.getTimeline(selector, legitHTTP).then((response) {
       if (response.statusCode != 200) {
         if (!infoFetchInProgress && uiLoadingTL.isShowing()) {
           uiLoadingTL.hide();
@@ -105,7 +107,7 @@ class _MyListScreenState extends State {
   _fetchInstanceInfo() async {
     infoFetchInProgress = true;
     uiLoadingTL.show();
-    await APIConnector.getInformation().then((response) {
+    await APIConnector.getInformation(legitHTTP).then((response) {
       setState(() {
         targetInstanceInfo = Instance.fromJson(json.decode(response.body));
         if (!tlFetchInProgress && uiLoadingTL.isShowing()) {
