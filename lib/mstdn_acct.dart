@@ -23,11 +23,17 @@ class Account {
     this.url, this.avatar, this.header, this.bot});
 
   factory Account.fromJson(Map<String, dynamic> json){
+    String finalDisplay;
+    if (json['display_name'] == "") {
+      finalDisplay = json['username'];
+    } else {
+      finalDisplay = json['display_name'];
+    }
     return Account(
       id: json['id'],
       username: json['username'],
       acct: json['acct'],
-      displayName: json['display_name'],
+      displayName: finalDisplay,
       locked: json['locked'],
       createdAt: json['created_at'],
       followersCount: json['followers_count'],
