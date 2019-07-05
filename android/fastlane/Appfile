@@ -1,0 +1,2 @@
+json_key_file("/home/frinkel/api-5890092974406559169-681359-60982e9e04a3.json") # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
+package_name("tech.frinkel.mobile.fediview") # e.g. com.krausefx.app

@@ -1,0 +1,1 @@
+An app for viewing public timelines on Mastodon API-compatible servers.
