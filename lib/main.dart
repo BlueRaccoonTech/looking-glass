@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/rendering.dart';
 
 import 'dart:convert';
 import 'mstdn_status.dart';
@@ -43,6 +44,7 @@ class _MyListScreenState extends State {
   Instance targetInstanceInfo;
   bool tlFetchInProgress = false;
   bool infoFetchInProgress = false;
+  bool scrollToTopVisible = false;
   final errorSnackBar = SnackBar(
       content: Text(errorFetching,
           textAlign: TextAlign.center,
@@ -120,6 +122,9 @@ class _MyListScreenState extends State {
   _scrollToTop() {
     _plzScrollForMe.animateTo(_plzScrollForMe.position.minScrollExtent,
         duration: Duration(milliseconds: 1000), curve: Curves.easeIn);
+    setState((){
+      scrollToTopVisible = false;
+    });
   }
 
   Future<void> _refreshTimeline() async {
@@ -374,6 +379,13 @@ class _MyListScreenState extends State {
   initState() {
     super.initState();
     _plzScrollForMe = ScrollController();
+    _plzScrollForMe.addListener((){
+      if(!scrollToTopVisible && _plzScrollForMe.position.userScrollDirection == ScrollDirection.reverse) {
+        setState(() {
+          scrollToTopVisible = true;
+        });
+      }
+    });
     SchedulerBinding.instance.addPostFrameCallback((_) =>
         uiLoadingTL = new ProgressDialog(context, ProgressDialogType.Normal));
     SchedulerBinding.instance.addPostFrameCallback((_) => _fetchInstanceInfo());
@@ -409,9 +421,12 @@ class _MyListScreenState extends State {
               ],
             ),
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: _scrollToTop,
-            child: Icon(Icons.arrow_upward),
+          floatingActionButton: Visibility(
+            visible: scrollToTopVisible,
+            child: FloatingActionButton(
+              onPressed: _scrollToTop,
+              child: Icon(Icons.arrow_upward),
+            ),
           ),
 
           /// Header Bar
