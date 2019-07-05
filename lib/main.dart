@@ -59,6 +59,13 @@ class _MyListScreenState extends State {
   ),
     backgroundColor: Colors.red,
   );
+  final sameViewSnackBar = SnackBar(
+    content: Text(sameViewFetching,
+      textAlign: TextAlign.center,
+      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+    ),
+    backgroundColor: Colors.blue,
+  );
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   _fetchTimeline(int selector) async {
@@ -458,6 +465,7 @@ class _MyListScreenState extends State {
                 ),
                 onPressed: () {
                   if (timeline.length < maxPosts) {
+                    _scaffoldKey.currentState.showSnackBar(sameViewSnackBar);
                     _fetchTimeline(3);
                   } else {
                     _fetchTimeline(2);

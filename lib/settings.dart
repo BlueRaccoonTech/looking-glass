@@ -26,3 +26,4 @@ String instanceInfo = protocol + targetInstance + apiURL + instanceInfoPath;
 
 String errorFetching = "There was an error fetching the data.\nPlease try again later.";
 String emptyFetching = "Nothing new!";
+String sameViewFetching = "Refreshing current page...";
