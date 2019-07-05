@@ -43,24 +43,53 @@ class _MyListScreenState extends State {
   Instance targetInstanceInfo;
   bool tlFetchInProgress = false;
   bool infoFetchInProgress = false;
+  final errorSnackBar = SnackBar(
+      content: Text(errorFetching,
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: Colors.red,
+  );
+  final emptySnackBar = SnackBar(
+    content: Text(emptyFetching,
+    textAlign: TextAlign.center,
+    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+  ),
+    backgroundColor: Colors.red,
+  );
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   _fetchTimeline(int selector) async {
     tlFetchInProgress = true;
     uiLoadingTL.setMessage("Loading " + targetInstance + "...");
     uiLoadingTL.show();
     await APIConnector.getTimeline(selector).then((response) {
-      setState(() {
-        String ucNavURLs = response.headers["link"];
-        Iterable cleanNavURLs = urlGrabber.allMatches(ucNavURLs);
-        nextURL = cleanNavURLs.elementAt(0).group(0).toString();
-        prevURL = cleanNavURLs.elementAt(1).group(0).toString();
-        Iterable list = json.decode(response.body);
-        timeline = list.map((model) => Status.fromJson(model)).toList();
+      if (response.statusCode != 200) {
         if (!infoFetchInProgress && uiLoadingTL.isShowing()) {
           uiLoadingTL.hide();
         }
         tlFetchInProgress = false;
-      });
+        _scaffoldKey.currentState.showSnackBar(errorSnackBar);
+      } else if(response.body == "[]") {
+        if (!infoFetchInProgress && uiLoadingTL.isShowing()) {
+          uiLoadingTL.hide();
+        }
+        tlFetchInProgress = false;
+        _scaffoldKey.currentState.showSnackBar(emptySnackBar);
+      } else {
+        setState(() {
+          String ucNavURLs = response.headers["link"];
+          Iterable cleanNavURLs = urlGrabber.allMatches(ucNavURLs);
+          nextURL = cleanNavURLs.elementAt(0).group(0).toString();
+          prevURL = cleanNavURLs.elementAt(1).group(0).toString();
+          Iterable list = json.decode(response.body);
+          timeline = list.map((model) => Status.fromJson(model)).toList();
+          if (!infoFetchInProgress && uiLoadingTL.isShowing()) {
+            uiLoadingTL.hide();
+          }
+          tlFetchInProgress = false;
+        });
+      }
     });
   }
 
@@ -364,6 +393,7 @@ class _MyListScreenState extends State {
         length: 2,
         initialIndex: 1,
         child: Scaffold(
+          key: _scaffoldKey,
           bottomNavigationBar: ColoredTabBar(
             Colors.black87,
             TabBar(
@@ -399,7 +429,7 @@ class _MyListScreenState extends State {
               IconButton(
                 icon: Icon(
                   Icons.arrow_back,
-                  semanticLabel: '20 Newer',
+                  semanticLabel: 'Older',
                 ),
                 onPressed: () {
                   _fetchTimeline(1);
@@ -409,10 +439,14 @@ class _MyListScreenState extends State {
               IconButton(
                 icon: Icon(
                   Icons.arrow_forward,
-                  semanticLabel: '20 Older',
+                  semanticLabel: 'Newer',
                 ),
                 onPressed: () {
-                  _fetchTimeline(2);
+                  if (timeline.length < maxPosts) {
+                    _fetchTimeline(3);
+                  } else {
+                    _fetchTimeline(2);
+                  }
                   _scrollToTop();
                 },
               ),

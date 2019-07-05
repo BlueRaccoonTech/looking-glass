@@ -18,8 +18,11 @@ String sourceURL = "https://git.frinkel.tech/root/looking-glass";
 String appDescription = "A reconnaissance tool for quickly displaying public "
     "posts from any social media website compatible with the Mastodon API.";
 
-RegExp urlGrabber = new RegExp(r"(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,12}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))");
+RegExp urlGrabber = RegExp(r"(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,12}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))");
 String nextURL = protocol + targetInstance + apiURL + apiTimelinePath + timelineType;
 String prevURL = protocol + targetInstance + apiURL + apiTimelinePath + timelineType;
 String latestURL = protocol + targetInstance + apiURL + apiTimelinePath + timelineType;
 String instanceInfo = protocol + targetInstance + apiURL + instanceInfoPath;
+
+String errorFetching = "There was an error fetching the data.\nPlease try again later.";
+String emptyFetching = "Nothing new!";
