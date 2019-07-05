@@ -43,7 +43,6 @@ class _MyListScreenState extends State {
   Instance targetInstanceInfo;
   bool tlFetchInProgress = false;
   bool infoFetchInProgress = false;
-  GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey<RefreshIndicatorState>();
 
   _fetchTimeline(int selector) async {
     tlFetchInProgress = true;
@@ -51,10 +50,10 @@ class _MyListScreenState extends State {
     uiLoadingTL.show();
     await APIConnector.getTimeline(selector).then((response) {
       setState(() {
-        String UCNavURLs = response.headers["link"];
-        Iterable CleanNavURLs = urlGrabber.allMatches(UCNavURLs);
-        nextURL = CleanNavURLs.elementAt(0).group(0).toString();
-        prevURL = CleanNavURLs.elementAt(1).group(0).toString();
+        String ucNavURLs = response.headers["link"];
+        Iterable cleanNavURLs = urlGrabber.allMatches(ucNavURLs);
+        nextURL = cleanNavURLs.elementAt(0).group(0).toString();
+        prevURL = cleanNavURLs.elementAt(1).group(0).toString();
         Iterable list = json.decode(response.body);
         timeline = list.map((model) => Status.fromJson(model)).toList();
         if (!infoFetchInProgress && uiLoadingTL.isShowing()) {
