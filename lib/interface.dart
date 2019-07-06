@@ -135,6 +135,46 @@ void showAbout(BuildContext context) {
   );
 }
 
+Future<bool> showLogoutDialog(BuildContext context) async {
+  bool shouldILogOut = false;
+  await showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+          title: Row(
+            children: <Widget>[
+              Text("Log Out?"),
+            ],
+          ),
+          content: Text("You will be unable to use any functions that require "
+              "authentication until you sign back in."),
+          actions: <Widget>[
+            MaterialButton(
+              child: new Text("Yes", style: TextStyle(color: Colors.white)),
+              color: headerColor,
+              onPressed: () {
+                print('I should log out.');
+                shouldILogOut = true;
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: new Text("No"),
+              onPressed: () {
+                print('I shouldn\'t log out.');
+                shouldILogOut = false;
+                Navigator.of(context).pop();
+              },
+            ),
+          ]);
+    },
+  ).then((val) {
+    print(shouldILogOut);
+    return shouldILogOut;
+  });
+  return shouldILogOut;
+}
+
 class ColoredTabBar extends Container implements PreferredSizeWidget {
   ColoredTabBar(this.color, this.tabBar);
   final Color color;

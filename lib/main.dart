@@ -217,6 +217,19 @@ class _MyListScreenState extends State {
     }
   }
 
+  void burnLoginCredentials() {
+    isAuthenticated = false;
+    appRegistered = false;
+    accessToken = null;
+    refreshToken = null;
+    madeTokenAt = null;
+    tokenExpiryIn = null;
+    saveLoginInfo();
+    clientID = null;
+    clientSecret = null;
+    saveClientInfo();
+  }
+
   /// Login-pertinent stuff ends here.
 
   Future<void> _refreshTimeline() async {
@@ -468,9 +481,70 @@ class _MyListScreenState extends State {
     );
   }
 
+  Widget lookingGlassDrawer() {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          DrawerHeader(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(
+                  AppLogo.LookingGlass.crystal_ball,
+                  color: Colors.white,
+                ),
+                Text(
+                  "   " + browserTitle,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
+                ),
+              ],
+            ),
+            decoration: BoxDecoration(
+              color: headerColor,
+            ),
+          ),
+          Visibility(
+            visible: !(isAuthenticated ?? false),
+            child: ListTile(
+              title: Text('Login'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+              },
+            ),
+          ),
+          Visibility(
+            visible: (isAuthenticated ?? false),
+            child: ListTile(
+              title: Text('Logout'),
+              onTap: () {
+                showLogoutDialog(context).then((shouldILogout) {
+                  if (shouldILogout) {
+                    print('Burning login credentials...');
+                    setState(() {
+                      burnLoginCredentials();
+                    });
+                  } else {
+                    print('Will not burn login credentials.');
+                  }
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   initState() {
-    super.initState();
     readPrefs();
+    super.initState();
     initUniLinks();
     _initDeepLinkListener();
 
@@ -538,7 +612,7 @@ class _MyListScreenState extends State {
                 showAbout(context);
               },
             ),
-            title: Text("The Looking Glass"),
+            title: Text(browserTitle),
             actions: <Widget>[
               IconButton(
                 icon: Icon(
@@ -578,46 +652,7 @@ class _MyListScreenState extends State {
             ],
           ),
 
-          drawer: Drawer(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: <Widget>[
-                DrawerHeader(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(
-                        AppLogo.LookingGlass.crystal_ball,
-                        color: Colors.white,
-                      ),
-                      Text(
-                        "   The Looking Glass",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                  decoration: BoxDecoration(
-                    color: headerColor,
-                  ),
-                ),
-                Visibility(
-                  visible: !(isAuthenticated ?? false),
-                  child: ListTile(
-                    title: Text('Login'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginPage()),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
+          drawer: lookingGlassDrawer(),
 
           body: Column(
             children: <Widget>[
