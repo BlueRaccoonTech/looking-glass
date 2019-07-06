@@ -64,6 +64,8 @@ void oauthWorkflow(String loggingInInstance) async {
   launch(authorizeLink);
 }
 
+final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+
 class _MyListScreenState extends State {
   List timeline = new List<Status>();
   StreamSubscription _subs;
@@ -95,7 +97,6 @@ class _MyListScreenState extends State {
     ),
     backgroundColor: Colors.blue,
   );
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   _fetchTimeline(int selector) async {
     tlFetchInProgress = true;
@@ -108,13 +109,13 @@ class _MyListScreenState extends State {
             uiLoadingTL.hide();
           }
           tlFetchInProgress = false;
-          _scaffoldKey.currentState.showSnackBar(errorSnackBar);
+          scaffoldKey.currentState.showSnackBar(errorSnackBar);
         } else if(response.body == "[]") {
           if (!infoFetchInProgress && uiLoadingTL.isShowing()) {
             uiLoadingTL.hide();
           }
           tlFetchInProgress = false;
-          _scaffoldKey.currentState.showSnackBar(emptySnackBar);
+          scaffoldKey.currentState.showSnackBar(emptySnackBar);
         } else {
           setState(() {
             String ucNavURLs = response.headers["link"];
@@ -139,13 +140,13 @@ class _MyListScreenState extends State {
             uiLoadingTL.hide();
           }
           tlFetchInProgress = false;
-          _scaffoldKey.currentState.showSnackBar(errorSnackBar);
+          scaffoldKey.currentState.showSnackBar(errorSnackBar);
         } else if(response.body == "[]") {
           if (!infoFetchInProgress && uiLoadingTL.isShowing()) {
             uiLoadingTL.hide();
           }
           tlFetchInProgress = false;
-          _scaffoldKey.currentState.showSnackBar(emptySnackBar);
+          scaffoldKey.currentState.showSnackBar(emptySnackBar);
         } else {
           setState(() {
             String ucNavURLs = response.headers["link"];
@@ -173,7 +174,7 @@ class _MyListScreenState extends State {
           uiLoadingTL.hide();
         }
         infoFetchInProgress = false;
-        _scaffoldKey.currentState.showSnackBar(errorSnackBar);
+        scaffoldKey.currentState.showSnackBar(errorSnackBar);
       } else {
         setState(() {
           targetInstanceInfo = Instance.fromJson(json.decode(response.body));
@@ -627,7 +628,7 @@ class _MyListScreenState extends State {
         length: 2,
         initialIndex: 1,
         child: Scaffold(
-          key: _scaffoldKey,
+          key: scaffoldKey,
           bottomNavigationBar: ColoredTabBar(
             Colors.black87,
             TabBar(
@@ -680,7 +681,7 @@ class _MyListScreenState extends State {
                 ),
                 onPressed: () {
                   if (timeline.length < maxPosts) {
-                    _scaffoldKey.currentState.showSnackBar(sameViewSnackBar);
+                    scaffoldKey.currentState.showSnackBar(sameViewSnackBar);
                     _fetchTimeline(3);
                   } else {
                     _fetchTimeline(2);

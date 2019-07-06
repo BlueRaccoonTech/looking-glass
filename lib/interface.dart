@@ -10,6 +10,20 @@ import 'main.dart';
 
 final specifyAnInstance = TextEditingController();
 final logIntoAnInstance = TextEditingController();
+final likedPostSnackBar = SnackBar(
+  content: Text("Liked the post!",
+    textAlign: TextAlign.center,
+    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+  ),
+  backgroundColor: Colors.deepPurple,
+);
+final rebloggedPostSnackBar = SnackBar(
+  content: Text("Reblogged the post!",
+    textAlign: TextAlign.center,
+    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+  ),
+  backgroundColor: Colors.green,
+);
 
 TextSpan makeURL(String linkText, String linkUrl, BuildContext context) {
   return TextSpan(
@@ -62,8 +76,10 @@ Widget interactionIcon(int type, int interactionCount, String id) {
     onTap: () {
       if (type == 2) {
         reblogStatus(legitHTTP, id);
+        scaffoldKey.currentState.showSnackBar(rebloggedPostSnackBar);
       } else if (type == 3) {
         favoriteStatus(legitHTTP, id);
+        scaffoldKey.currentState.showSnackBar(likedPostSnackBar);
       }
     }
   );
