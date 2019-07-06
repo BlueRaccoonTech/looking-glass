@@ -1,44 +1,103 @@
-/// All the little things one might want to configure.
-/// All in one neat little package. :3
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final tiKey = 'targetInstance';
+/// Keys for persistent loading...
+final   tiKey = 'targetInstance';
 
-readTI() async {
-  final prefs = await SharedPreferences.getInstance();
-  targetInstance = prefs.getString(tiKey) ?? "mastodon.social";
-  print('Loaded ' + targetInstance + ' from memory.');
+/// Keys for API info...
+final   arKey = 'appRegistered';
+final   liKey = 'loginInstance';
+final   ciKey = 'clientID';
+final   csKey = 'clientSecret';
+
+/// Keys for login info...
+final   iaKey = 'isAuthenticated';
+final   rtKey = 'refreshToken';
+final   atKey = 'accessToken';
+final   teKey = 'tokenExpiryIn';
+final   mtKey = 'madeTokenAt';
+
+/// Preferences to be loaded...
+String  targetInstance;
+String  timelineType = "public";
+bool    localOnly = true;
+int     maxPosts = 20;
+
+/// App info to be loaded...
+bool    appRegistered;
+String  loginInstance;
+String  clientID;
+String  clientSecret;
+
+/// Login info to be loaded...
+bool    isAuthenticated;
+String  refreshToken;
+String  accessToken;
+int     tokenExpiryIn;
+int     madeTokenAt;
+
+
+readPrefs() async {
+  final prefs     = await SharedPreferences.getInstance();
+  targetInstance  = prefs.getString(tiKey) ?? "mastodon.social";
+  appRegistered   = prefs.getBool(arKey) ?? false;
+  loginInstance   = prefs.getString(liKey) ?? null;
+  clientID        = prefs.getString(ciKey) ?? null;
+  clientSecret    = prefs.getString(csKey) ?? null;
+
+  isAuthenticated = prefs.getBool(iaKey) ?? false;
+  refreshToken    = prefs.getString(rtKey) ?? null;
+  accessToken     = prefs.getString(atKey) ?? null;
+  tokenExpiryIn   = prefs.getInt(teKey) ?? null;
+  madeTokenAt     = prefs.getInt(mtKey) ?? null;
 }
 
 saveTI() async {
   final prefs = await SharedPreferences.getInstance();
   prefs.setString(tiKey, targetInstance);
-  print('Saved' + targetInstance + 'to memory.');
 }
 
-Color headerColor = Colors.black54;
+saveClientInfo() async {
+  final prefs   = await SharedPreferences.getInstance();
+  prefs.setBool(arKey, appRegistered);
+  prefs.setString(liKey, loginInstance);
+  prefs.setString(ciKey, clientID);
+  prefs.setString(csKey, clientSecret);
+}
 
-String protocol = "https://";
-String targetInstance = "mastodon.social";
-String apiURL = "/api/v1/";
-String apiTimelinePath = "timelines/";
-String instanceInfoPath = "instance";
-String timelineType = "public";
-var localOnly = true;
-int maxPosts = 20;
+saveLoginInfo() async {
+  final prefs   = await SharedPreferences.getInstance();
+  prefs.setBool(iaKey, isAuthenticated);
+  prefs.setString(rtKey, refreshToken);
+  prefs.setString(atKey, accessToken);
+  prefs.setInt(teKey, tokenExpiryIn);
+  prefs.setInt(mtKey, madeTokenAt);
+}
 
-String sourceURL = "https://git.frinkel.tech/root/looking-glass";
-
-String appDescription = "A reconnaissance tool for quickly displaying public "
+final Color headerColor = Colors.black54;
+final String protocol = "https://";
+final String apiURL = "/api/v1/";
+final String apiTimelinePath = "timelines/";
+final String instanceInfoPath = "instance";
+final String sourceURL = "https://git.frinkel.tech/root/looking-glass";
+final String appDescription = "A reconnaissance tool for quickly displaying public "
     "posts from any social media website compatible with the Mastodon API.";
+final RegExp urlGrabber = RegExp(r"(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,12}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))");
+final String errorFetching = "There was an error fetching the data.\nPlease try again later.";
+final String emptyFetching = "Nothing new!";
+final String sameViewFetching = "Refreshing current page...";
+final List<String> nonCompliantInstances = ["gab.com","gab.ai"];
 
-RegExp urlGrabber = RegExp(r"(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,12}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))");
+final String clientName = "Looking Glass";
+final String redirectURI = "lglass://fedi-auth";
+final String scopes = "write read follow push";
+final String appRegisterPath = "/api/v1/apps?client_name=" + clientName +
+    "&redirect_uris=" + redirectURI + "&scopes=" + scopes + "&website=" + sourceURL;
+
 String nextURL = protocol + targetInstance + apiURL + apiTimelinePath + timelineType;
 String prevURL = protocol + targetInstance + apiURL + apiTimelinePath + timelineType;
 String latestURL = protocol + targetInstance + apiURL + apiTimelinePath + timelineType;
 String instanceInfo = protocol + targetInstance + apiURL + instanceInfoPath;
-
-String errorFetching = "There was an error fetching the data.\nPlease try again later.";
-String emptyFetching = "Nothing new!";
-String sameViewFetching = "Refreshing current page...";
+String latestHomeURL;
+String nextHomeURL;
+String prevHomeURL;

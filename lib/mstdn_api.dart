@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:http/io_client.dart';
 import 'settings.dart';
+import 'dart:io';
 
 class APIConnector {
   static Future getTimeline(int selector, IOClient client) {
@@ -23,5 +24,22 @@ class APIConnector {
     saveTI();
     instanceInfo = protocol + targetInstance + apiURL + instanceInfoPath;
     return client.get(instanceInfo);
+  }
+
+  static Future getHomeTimeline(int selector, IOClient client) {
+    if (!isAuthenticated) {
+      throw Exception("Not signed in!");
+    } else {
+      if (selector == 0) {
+        String urlOptions = "?maxPosts=" + maxPosts.toString();
+        latestHomeURL = protocol + loginInstance + apiURL + apiTimelinePath + "home" + urlOptions;
+      } else if (selector == 1) {
+        latestHomeURL = nextHomeURL;
+      } else if (selector == 2) {
+        latestHomeURL = prevHomeURL;
+      }
+
+      return client.get(latestHomeURL, headers: {HttpHeaders.authorizationHeader: "Bearer " + accessToken});
+    }
   }
 }

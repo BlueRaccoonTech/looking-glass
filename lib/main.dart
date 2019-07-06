@@ -10,11 +10,14 @@ import 'mstdn_api.dart';
 import 'mstdn_info.dart';
 import 'interface.dart';
 import 'settings.dart';
+import 'mstdn_login.dart';
+import 'dart:async';
 
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/io_client.dart';
+import 'package:uni_links/uni_links.dart';
 
 import 'looking_glass_icons.dart' as AppLogo;
 
@@ -39,7 +42,8 @@ class MyListScreen extends StatefulWidget {
 }
 
 class _MyListScreenState extends State {
-  var timeline = new List<Status>();
+  List timeline = new List<Status>();
+  StreamSubscription _subs;
   ProgressDialog uiLoadingTL;
   ScrollController _plzScrollForMe;
   Instance targetInstanceInfo;
@@ -47,6 +51,7 @@ class _MyListScreenState extends State {
   bool infoFetchInProgress = false;
   bool scrollToTopVisible = false;
   IOClient legitHTTP = new IOClient();
+
   final errorSnackBar = SnackBar(
       content: Text(errorFetching,
           textAlign: TextAlign.center,
@@ -143,6 +148,65 @@ class _MyListScreenState extends State {
       scrollToTopVisible = false;
     });
   }
+
+  /// Login-pertinent stuff begins here.
+
+  void _disposeDeepLinkListener() {
+    if (_subs != null) {
+      _subs.cancel();
+      _subs = null;
+    }
+  }
+
+  void _initDeepLinkListener() async {
+    _subs = getLinksStream().listen((String link) {
+      _checkDeepLink(link);
+    }, cancelOnError: true);
+  }
+
+  void _checkDeepLink(String link) async {
+    if (link != null) {
+      // I've probably immensely screwed this up. But... YOLO!
+      String code = link.substring(link.indexOf(RegExp('code=')) + 5,
+          link.indexOf(RegExp('code=')) + 49);
+      print(code);
+
+      // So now I've got the auth code... we're on the home stretch!
+      OAuthToken userLogin = await instanceAuth(legitHTTP, code);
+
+      // Wow, so if I've somehow made it to this point, then we're logged in.
+      // Time to save all those keys.
+      setState((){
+        isAuthenticated = true;
+        accessToken = userLogin.accessToken;
+        refreshToken = userLogin.refreshToken;
+        madeTokenAt = userLogin.createdAt;
+        tokenExpiryIn = userLogin.expiresIn;
+      });
+      saveLoginInfo();
+    }
+  }
+
+  void oauthWorkflow() async {
+    // TODO: Add spot to specify login instance.
+    loginInstance = "transfurrmation.town";
+
+    checkLicenseCompliance(loginInstance);
+
+    FediApp appRegistration = await registerApp(legitHTTP);
+
+    appRegistered = true;
+    clientID = appRegistration.clientID;
+    clientSecret = appRegistration.clientSecret;
+    saveClientInfo();
+
+    String authorizeLink = protocol + loginInstance + "/oauth/authorize?"
+        "response_type=code&client_id=" + clientID + "&client_secret=" +
+        clientSecret + "&redirect_uri=" + redirectURI + "&scope=" + scopes;
+    launch(authorizeLink);
+  }
+
+  /// Login-pertinent stuff ends here.
 
   Future<void> _refreshTimeline() async {
     _fetchTimeline(3);
@@ -395,6 +459,9 @@ class _MyListScreenState extends State {
 
   initState() {
     super.initState();
+
+    _initDeepLinkListener();
+
     _plzScrollForMe = ScrollController();
     _plzScrollForMe.addListener((){
       if(!scrollToTopVisible && _plzScrollForMe.position.userScrollDirection == ScrollDirection.reverse) {
@@ -403,7 +470,9 @@ class _MyListScreenState extends State {
         });
       }
     });
-    readTI();
+
+    readPrefs();
+
     SchedulerBinding.instance.addPostFrameCallback((_) =>
         uiLoadingTL = new ProgressDialog(context, ProgressDialogType.Normal));
     SchedulerBinding.instance.addPostFrameCallback((_) => _fetchInstanceInfo());
@@ -413,6 +482,7 @@ class _MyListScreenState extends State {
   dispose() {
     specifyAnInstance.dispose();
     _plzScrollForMe.dispose();
+    _disposeDeepLinkListener();
     super.dispose();
   }
 
