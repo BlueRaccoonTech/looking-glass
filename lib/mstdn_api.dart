@@ -16,6 +16,7 @@ class APIConnector {
     } else if (selector == 2) {
       latestURL = prevURL;
     }
+
     return client.get(latestURL);
   }
   static Future getInformation(IOClient client) {

@@ -108,13 +108,21 @@ class _MyListScreenState extends State {
     infoFetchInProgress = true;
     uiLoadingTL.show();
     await APIConnector.getInformation(legitHTTP).then((response) {
-      setState(() {
-        targetInstanceInfo = Instance.fromJson(json.decode(response.body));
+      if (response.statusCode != 200 || response.body == "[]") {
         if (!tlFetchInProgress && uiLoadingTL.isShowing()) {
           uiLoadingTL.hide();
         }
         infoFetchInProgress = false;
-      });
+        _scaffoldKey.currentState.showSnackBar(errorSnackBar);
+      } else {
+        setState(() {
+          targetInstanceInfo = Instance.fromJson(json.decode(response.body));
+          if (!tlFetchInProgress && uiLoadingTL.isShowing()) {
+            uiLoadingTL.hide();
+          }
+          infoFetchInProgress = false;
+        });
+      }
     });
   }
 

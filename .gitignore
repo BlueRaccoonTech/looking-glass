@@ -71,3 +71,6 @@
 
 # How the *pelican noises* is this not here?
 **/android/key.properties
+
+# Oh and this should be here too.
+**/android/app/google-services.json
