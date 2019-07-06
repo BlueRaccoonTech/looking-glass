@@ -1,6 +1,21 @@
 /// All the little things one might want to configure.
 /// All in one neat little package. :3
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+final tiKey = 'targetInstance';
+
+readTI() async {
+  final prefs = await SharedPreferences.getInstance();
+  targetInstance = prefs.getString(tiKey) ?? "mastodon.social";
+  print('Loaded ' + targetInstance + ' from memory.');
+}
+
+saveTI() async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setString(tiKey, targetInstance);
+  print('Saved' + targetInstance + 'to memory.');
+}
 
 Color headerColor = Colors.black54;
 

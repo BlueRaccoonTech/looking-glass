@@ -403,6 +403,7 @@ class _MyListScreenState extends State {
         });
       }
     });
+    readTI();
     SchedulerBinding.instance.addPostFrameCallback((_) =>
         uiLoadingTL = new ProgressDialog(context, ProgressDialogType.Normal));
     SchedulerBinding.instance.addPostFrameCallback((_) => _fetchInstanceInfo());

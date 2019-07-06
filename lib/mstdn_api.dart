@@ -20,6 +20,7 @@ class APIConnector {
     return client.get(latestURL);
   }
   static Future getInformation(IOClient client) {
+    saveTI();
     instanceInfo = protocol + targetInstance + apiURL + instanceInfoPath;
     return client.get(instanceInfo);
   }
