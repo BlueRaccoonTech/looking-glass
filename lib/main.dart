@@ -527,6 +527,7 @@ class _MyListScreenState extends State {
                 showLogoutDialog(context).then((shouldILogout) {
                   if (shouldILogout) {
                     print('Burning login credentials...');
+                    revokeLoginCredentials(legitHTTP);
                     setState(() {
                       burnLoginCredentials();
                     });
