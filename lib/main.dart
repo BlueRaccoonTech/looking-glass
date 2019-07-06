@@ -99,36 +99,69 @@ class _MyListScreenState extends State {
 
   _fetchTimeline(int selector) async {
     tlFetchInProgress = true;
-    uiLoadingTL.setMessage("Loading " + targetInstance + "...");
-    uiLoadingTL.show();
-    await APIConnector.getTimeline(selector, legitHTTP).then((response) {
-      if (response.statusCode != 200) {
-        if (!infoFetchInProgress && uiLoadingTL.isShowing()) {
-          uiLoadingTL.hide();
-        }
-        tlFetchInProgress = false;
-        _scaffoldKey.currentState.showSnackBar(errorSnackBar);
-      } else if(response.body == "[]") {
-        if (!infoFetchInProgress && uiLoadingTL.isShowing()) {
-          uiLoadingTL.hide();
-        }
-        tlFetchInProgress = false;
-        _scaffoldKey.currentState.showSnackBar(emptySnackBar);
-      } else {
-        setState(() {
-          String ucNavURLs = response.headers["link"];
-          Iterable cleanNavURLs = urlGrabber.allMatches(ucNavURLs);
-          nextURL = cleanNavURLs.elementAt(0).group(0).toString();
-          prevURL = cleanNavURLs.elementAt(1).group(0).toString();
-          Iterable list = json.decode(response.body);
-          timeline = list.map((model) => Status.fromJson(model)).toList();
+    if(isAuthenticated) {
+      uiLoadingTL.setMessage("Loading " + loginInstance + "...");
+      uiLoadingTL.show();
+      await APIConnector.getHomeTimeline(selector, legitHTTP).then((response) {
+        if (response.statusCode != 200) {
           if (!infoFetchInProgress && uiLoadingTL.isShowing()) {
             uiLoadingTL.hide();
           }
           tlFetchInProgress = false;
-        });
-      }
-    });
+          _scaffoldKey.currentState.showSnackBar(errorSnackBar);
+        } else if(response.body == "[]") {
+          if (!infoFetchInProgress && uiLoadingTL.isShowing()) {
+            uiLoadingTL.hide();
+          }
+          tlFetchInProgress = false;
+          _scaffoldKey.currentState.showSnackBar(emptySnackBar);
+        } else {
+          setState(() {
+            String ucNavURLs = response.headers["link"];
+            Iterable cleanNavURLs = urlGrabber.allMatches(ucNavURLs);
+            nextURL = cleanNavURLs.elementAt(0).group(0).toString();
+            prevURL = cleanNavURLs.elementAt(1).group(0).toString();
+            Iterable list = json.decode(response.body);
+            timeline = list.map((model) => Status.fromJson(model)).toList();
+            if (!infoFetchInProgress && uiLoadingTL.isShowing()) {
+              uiLoadingTL.hide();
+            }
+            tlFetchInProgress = false;
+          });
+        }
+      });
+    } else {
+      uiLoadingTL.setMessage("Loading " + targetInstance + "...");
+      uiLoadingTL.show();
+      await APIConnector.getTimeline(selector, legitHTTP).then((response) {
+        if (response.statusCode != 200) {
+          if (!infoFetchInProgress && uiLoadingTL.isShowing()) {
+            uiLoadingTL.hide();
+          }
+          tlFetchInProgress = false;
+          _scaffoldKey.currentState.showSnackBar(errorSnackBar);
+        } else if(response.body == "[]") {
+          if (!infoFetchInProgress && uiLoadingTL.isShowing()) {
+            uiLoadingTL.hide();
+          }
+          tlFetchInProgress = false;
+          _scaffoldKey.currentState.showSnackBar(emptySnackBar);
+        } else {
+          setState(() {
+            String ucNavURLs = response.headers["link"];
+            Iterable cleanNavURLs = urlGrabber.allMatches(ucNavURLs);
+            nextURL = cleanNavURLs.elementAt(0).group(0).toString();
+            prevURL = cleanNavURLs.elementAt(1).group(0).toString();
+            Iterable list = json.decode(response.body);
+            timeline = list.map((model) => Status.fromJson(model)).toList();
+            if (!infoFetchInProgress && uiLoadingTL.isShowing()) {
+              uiLoadingTL.hide();
+            }
+            tlFetchInProgress = false;
+          });
+        }
+      });
+    }
   }
 
   _fetchInstanceInfo() async {
@@ -214,6 +247,8 @@ class _MyListScreenState extends State {
         tokenExpiryIn = userLogin.expiresIn;
       });
       saveLoginInfo();
+      _fetchTimeline(0);
+      _fetchInstanceInfo();
     }
   }
 
@@ -234,6 +269,14 @@ class _MyListScreenState extends State {
 
   Future<void> _refreshTimeline() async {
     _fetchTimeline(3);
+  }
+
+  Widget returnBasedOnAuth(Widget auth, Widget noAuth) {
+    if(isAuthenticated) {
+      return auth;
+    } else {
+      return noAuth;
+    }
   }
 
   Widget timelineViewer() {
@@ -279,8 +322,12 @@ class _MyListScreenState extends State {
                                   },
                               ),
                             ),
-                            subtitle: Text(timeline[index].createdAt),
-                          )),
+                            subtitle: returnBasedOnAuth(
+                              Text(timeline[index].account.acct),
+                              Text(timeline[index].createdAt)
+                            ),
+                          )
+                      ),
                       Divider(
                         height: 0,
                         color: Color.fromARGB(255, 0, 0, 0),
@@ -526,13 +573,12 @@ class _MyListScreenState extends State {
               onTap: () {
                 showLogoutDialog(context).then((shouldILogout) {
                   if (shouldILogout) {
-                    print('Burning login credentials...');
                     revokeLoginCredentials(legitHTTP);
                     setState(() {
                       burnLoginCredentials();
                     });
+                    updateInstance();
                   } else {
-                    print('Will not burn login credentials.');
                   }
                 });
               },
@@ -657,43 +703,46 @@ class _MyListScreenState extends State {
 
           body: Column(
             children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(20, 0, 1, 0),
-                    child: Text(
-                      'https://',
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontSize: 16.0,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
-                      child: TextField(
-                        controller: specifyAnInstance,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: targetInstance,
+              Visibility(
+                visible: !(isAuthenticated ?? false),
+                child: Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, 0, 1, 0),
+                      child: Text(
+                        'https://',
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontSize: 16.0,
                         ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(8, 0, 0, 0),
-                    child: Container(
-                      color: Colors.lightBlueAccent,
-                      child: IconButton(
-                        icon: Icon(Icons.forward),
-                        onPressed: () {
-                          updateInstance();
-                        },
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
+                        child: TextField(
+                          controller: specifyAnInstance,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: targetInstance,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(8, 0, 0, 0),
+                      child: Container(
+                        color: Colors.lightBlueAccent,
+                        child: IconButton(
+                          icon: Icon(Icons.forward),
+                          onPressed: () {
+                            updateInstance();
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Divider(
                 height: 0.0,

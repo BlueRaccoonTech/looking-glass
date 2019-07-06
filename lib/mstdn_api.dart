@@ -21,7 +21,11 @@ class APIConnector {
     return client.get(latestURL);
   }
   static Future getInformation(IOClient client) {
-    instanceInfo = "https://" + targetInstance + apiURL + instanceInfoPath;
+    if(isAuthenticated) {
+      instanceInfo = "https://" + loginInstance + apiURL + instanceInfoPath;
+    } else {
+      instanceInfo = "https://" + targetInstance + apiURL + instanceInfoPath;
+    }
     return client.get(instanceInfo);
   }
 
@@ -29,15 +33,13 @@ class APIConnector {
     if (!isAuthenticated) {
       throw Exception("Not signed in!");
     } else {
+      latestHomeURL = "https://" + loginInstance + apiURL + apiTimelinePath + "home?maxPosts=" + maxPosts.toString();
       if (selector == 0) {
-        String urlOptions = "?maxPosts=" + maxPosts.toString();
-        latestHomeURL = "https://" + loginInstance + apiURL + apiTimelinePath + "home" + urlOptions;
       } else if (selector == 1) {
         latestHomeURL = nextHomeURL;
       } else if (selector == 2) {
         latestHomeURL = prevHomeURL;
       }
-
       return client.get(latestHomeURL, headers: {HttpHeaders.authorizationHeader: "Bearer " + accessToken});
     }
   }
