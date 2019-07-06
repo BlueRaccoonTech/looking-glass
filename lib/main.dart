@@ -13,6 +13,7 @@ import 'settings.dart';
 import 'mstdn_login.dart';
 import 'dart:async';
 import 'loginScreen.dart';
+import 'dart:io';
 
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:progress_dialog/progress_dialog.dart';
@@ -179,6 +180,14 @@ class _MyListScreenState extends State {
     }
   }
 
+  Future<Null> initUniLinks() async {
+    try {
+      String initialLink = await getInitialLink();
+      _checkDeepLink(initialLink);
+    } on PlatformException {
+    }
+  }
+
   void _initDeepLinkListener() async {
     _subs = getLinksStream().listen((String link) {
       _checkDeepLink(link);
@@ -189,7 +198,7 @@ class _MyListScreenState extends State {
     if (link != null) {
       // I've probably immensely screwed this up. But... YOLO!
       String code = link.substring(link.indexOf(RegExp('code=')) + 5,
-          link.indexOf(RegExp('code=')) + 49);
+          link.indexOf(RegExp('code=')) + 48);
       print(code);
 
       // So now I've got the auth code... we're on the home stretch!
@@ -461,7 +470,8 @@ class _MyListScreenState extends State {
 
   initState() {
     super.initState();
-
+    readPrefs();
+    initUniLinks();
     _initDeepLinkListener();
 
     _plzScrollForMe = ScrollController();
@@ -472,8 +482,6 @@ class _MyListScreenState extends State {
         });
       }
     });
-
-    readPrefs();
 
     SchedulerBinding.instance.addPostFrameCallback((_) =>
         uiLoadingTL = new ProgressDialog(context, ProgressDialogType.Normal));
