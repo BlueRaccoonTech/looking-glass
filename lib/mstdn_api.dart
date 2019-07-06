@@ -21,7 +21,7 @@ class APIConnector {
     return client.get(latestURL);
   }
   static Future getInformation(IOClient client) {
-    if(isAuthenticated) {
+    if(isAuthenticated ?? false) {
       instanceInfo = "https://" + loginInstance + apiURL + instanceInfoPath;
     } else {
       instanceInfo = "https://" + targetInstance + apiURL + instanceInfoPath;

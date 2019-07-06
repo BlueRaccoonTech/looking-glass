@@ -28,9 +28,10 @@ class OAuthToken {
   final int expiresIn;
   final int createdAt;
   final String accessToken;
+  final String meURL;
 
   OAuthToken({this.refreshToken, this.expiresIn, this.createdAt,
-    this.accessToken});
+    this.accessToken, this.meURL});
 
   factory OAuthToken.fromJson(Map<String, dynamic> json){
     return OAuthToken(
@@ -38,6 +39,7 @@ class OAuthToken {
       expiresIn:    json['expires_in'] ?? 0,
       createdAt:    json['created_at'],
       accessToken:  json['access_token'],
+      meURL:        json['me'] ?? "Logged In User",
     );
   }
 }

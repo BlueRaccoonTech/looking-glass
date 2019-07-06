@@ -5,6 +5,8 @@ import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'looking_glass_icons.dart' as AppLogo;
 import 'settings.dart';
+import 'mstdn_status.dart';
+import 'main.dart';
 
 final specifyAnInstance = TextEditingController();
 final logIntoAnInstance = TextEditingController();
@@ -24,7 +26,7 @@ TextSpan makeURL(String linkText, String linkUrl, BuildContext context) {
   );
 }
 
-Widget interactionIcon(int type, int interactionCount) {
+Widget interactionIcon(int type, int interactionCount, String id) {
   IconData interactionIcon;
   Color interactionColor;
   if (type == 1) {
@@ -37,33 +39,42 @@ Widget interactionIcon(int type, int interactionCount) {
     interactionColor = Colors.deepPurple;
     interactionIcon = Icons.favorite;
   }
-  return Row(
-    children: <Widget>[
-      Padding(
-        padding: EdgeInsets.fromLTRB(5, 0, 4, 0),
-        child: Icon(
-          interactionIcon,
-          color: interactionColor,
-          size: 30.0,
+  return InkWell(
+    child: Row(
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.fromLTRB(5, 0, 4, 0),
+          child: Icon(
+            interactionIcon,
+            color: interactionColor,
+            size: 30.0,
+          ),
         ),
-      ),
-      Padding(
-        padding: EdgeInsets.fromLTRB(4, 0, 15, 0),
-        child: Text(
-          interactionCount.toString(),
-          style: TextStyle(color: interactionColor),
+        Padding(
+          padding: EdgeInsets.fromLTRB(4, 0, 15, 0),
+          child: Text(
+            interactionCount.toString(),
+            style: TextStyle(color: interactionColor),
+          ),
         ),
-      ),
-    ],
+      ],
+    ),
+    onTap: () {
+      if (type == 2) {
+        reblogStatus(legitHTTP, id);
+      } else if (type == 3) {
+        favoriteStatus(legitHTTP, id);
+      }
+    }
   );
 }
 
-Widget interactionBar(int replies, int boosts, int favs, String url) {
+Widget interactionBar(String id, int replies, int boosts, int favs, String url) {
   return Row(
     children: <Widget>[
-      interactionIcon(1, replies),
-      interactionIcon(2, boosts),
-      interactionIcon(3, favs),
+      interactionIcon(1, replies, id),
+      interactionIcon(2, boosts, id),
+      interactionIcon(3, favs, id),
       Expanded(
         child: Text(''),
       ),
@@ -153,7 +164,6 @@ Future<bool> showLogoutDialog(BuildContext context) async {
               child: new Text("Yes", style: TextStyle(color: Colors.white)),
               color: headerColor,
               onPressed: () {
-                print('I should log out.');
                 shouldILogOut = true;
                 Navigator.of(context).pop();
               },
@@ -161,7 +171,6 @@ Future<bool> showLogoutDialog(BuildContext context) async {
             FlatButton(
               child: new Text("No"),
               onPressed: () {
-                print('I shouldn\'t log out.');
                 shouldILogOut = false;
                 Navigator.of(context).pop();
               },
@@ -169,7 +178,6 @@ Future<bool> showLogoutDialog(BuildContext context) async {
           ]);
     },
   ).then((val) {
-    print(shouldILogOut);
     return shouldILogOut;
   });
   return shouldILogOut;

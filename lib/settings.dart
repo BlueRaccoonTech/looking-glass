@@ -16,6 +16,7 @@ final   rtKey = 'refreshToken';
 final   atKey = 'accessToken';
 final   teKey = 'tokenExpiryIn';
 final   mtKey = 'madeTokenAt';
+final   muKey = 'meURL';
 
 /// Preferences to be loaded...
 String  targetInstance = "mastodon.social";
@@ -35,6 +36,7 @@ String  refreshToken;
 String  accessToken;
 int     tokenExpiryIn;
 int     madeTokenAt;
+String  meURL;
 
 
 readPrefs() async {
@@ -50,8 +52,7 @@ readPrefs() async {
   accessToken     = prefs.getString(atKey) ?? null;
   tokenExpiryIn   = prefs.getInt(teKey) ?? null;
   madeTokenAt     = prefs.getInt(mtKey) ?? null;
-  print(appRegistered);
-  print(isAuthenticated);
+  meURL           = prefs.getString(muKey) ?? null;
 }
 
 saveTI() async {
@@ -74,6 +75,7 @@ saveLoginInfo() async {
   prefs.setString(atKey, accessToken);
   prefs.setInt(teKey, tokenExpiryIn);
   prefs.setInt(mtKey, madeTokenAt);
+  prefs.setString(muKey, meURL);
 }
 
 final Color headerColor = Colors.black54;

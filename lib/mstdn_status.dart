@@ -2,6 +2,9 @@
 import 'mstdn_acct.dart';
 import 'package:html2md/html2md.dart' as html2md;
 import 'package:intl/intl.dart';
+import 'package:http/io_client.dart' as http;
+import 'settings.dart';
+import 'dart:io';
 
 class Status {
   final String id;
@@ -61,5 +64,29 @@ class Status {
       pinned: parsedJson['pinned'],
       isInvisible: !parsedJson['spoiler_text'].isNotEmpty,
     );
+  }
+}
+
+void favoriteStatus(http.IOClient client, String postID) async {
+  // statuses/:id/favourite
+  if(isAuthenticated) {
+    String favPostURL = "https://" + loginInstance + apiURL + "statuses/" +
+        postID + "/favourite";
+    final response = await client.post(favPostURL, headers: {HttpHeaders.authorizationHeader: "Bearer " + accessToken});
+    if(response.statusCode != 200) {
+      throw Exception("Ran head-first into an issue faving that post, sorry.");
+    }
+  }
+}
+
+void reblogStatus(http.IOClient client, String postID) async {
+  // statuses/:id/favourite
+  if(isAuthenticated) {
+    String reblogPostURL = "https://" + loginInstance + apiURL + "statuses/" +
+        postID + "/reblog";
+    final response = await client.post(reblogPostURL, headers: {HttpHeaders.authorizationHeader: "Bearer " + accessToken});
+    if(response.statusCode != 200) {
+      throw Exception("Ran head-first into an issue reblogging that post, sorry.");
+    }
   }
 }

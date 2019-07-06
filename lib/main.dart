@@ -99,7 +99,7 @@ class _MyListScreenState extends State {
 
   _fetchTimeline(int selector) async {
     tlFetchInProgress = true;
-    if(isAuthenticated) {
+    if(isAuthenticated ?? false) {
       uiLoadingTL.setMessage("Loading " + loginInstance + "...");
       uiLoadingTL.show();
       await APIConnector.getHomeTimeline(selector, legitHTTP).then((response) {
@@ -119,8 +119,8 @@ class _MyListScreenState extends State {
           setState(() {
             String ucNavURLs = response.headers["link"];
             Iterable cleanNavURLs = urlGrabber.allMatches(ucNavURLs);
-            nextURL = cleanNavURLs.elementAt(0).group(0).toString();
-            prevURL = cleanNavURLs.elementAt(1).group(0).toString();
+            nextHomeURL = cleanNavURLs.elementAt(0).group(0).toString();
+            prevHomeURL = cleanNavURLs.elementAt(1).group(0).toString();
             Iterable list = json.decode(response.body);
             timeline = list.map((model) => Status.fromJson(model)).toList();
             if (!infoFetchInProgress && uiLoadingTL.isShowing()) {
@@ -232,7 +232,6 @@ class _MyListScreenState extends State {
       // I've probably immensely screwed this up. But... YOLO!
       String code = link.substring(link.indexOf(RegExp('code=')) + 5,
           link.indexOf(RegExp('code=')) + 48);
-      print(code);
 
       // So now I've got the auth code... we're on the home stretch!
       OAuthToken userLogin = await instanceAuth(legitHTTP, code);
@@ -245,6 +244,7 @@ class _MyListScreenState extends State {
         refreshToken = userLogin.refreshToken;
         madeTokenAt = userLogin.createdAt;
         tokenExpiryIn = userLogin.expiresIn;
+        meURL = userLogin.meURL;
       });
       saveLoginInfo();
       _fetchTimeline(0);
@@ -259,6 +259,7 @@ class _MyListScreenState extends State {
     refreshToken = null;
     madeTokenAt = null;
     tokenExpiryIn = null;
+    meURL = null;
     saveLoginInfo();
     clientID = null;
     clientSecret = null;
@@ -384,6 +385,7 @@ class _MyListScreenState extends State {
                       Padding(
                         padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
                         child: interactionBar(
+                            timeline[index].id,
                             timeline[index].repliesCount,
                             timeline[index].reblogsCount,
                             timeline[index].favouritesCount,
