@@ -18,7 +18,7 @@ final   teKey = 'tokenExpiryIn';
 final   mtKey = 'madeTokenAt';
 
 /// Preferences to be loaded...
-String  targetInstance;
+String  targetInstance = "mastodon.social";
 String  timelineType = "public";
 bool    localOnly = true;
 int     maxPosts = 20;
@@ -50,6 +50,8 @@ readPrefs() async {
   accessToken     = prefs.getString(atKey) ?? null;
   tokenExpiryIn   = prefs.getInt(teKey) ?? null;
   madeTokenAt     = prefs.getInt(mtKey) ?? null;
+  print(appRegistered);
+  print(isAuthenticated);
 }
 
 saveTI() async {
@@ -80,6 +82,7 @@ final String apiURL = "/api/v1/";
 final String apiTimelinePath = "timelines/";
 final String instanceInfoPath = "instance";
 final String sourceURL = "https://git.frinkel.tech/root/looking-glass";
+final String sourceURLEscaped = "https%3A%2F%2Fgit.frinkel.tech%2Froot%2Flooking-glass";
 final String appDescription = "A reconnaissance tool for quickly displaying public "
     "posts from any social media website compatible with the Mastodon API.";
 final RegExp urlGrabber = RegExp(r"(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,12}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))");
@@ -88,11 +91,11 @@ final String emptyFetching = "Nothing new!";
 final String sameViewFetching = "Refreshing current page...";
 final List<String> nonCompliantInstances = ["gab.com","gab.ai"];
 
-final String clientName = "Looking Glass";
-final String redirectURI = "lglass://fedi-auth";
-final String scopes = "write read follow push";
+final String clientName = "Looking%20Glass";
+final String redirectURI = "lglass%3A%2F%2Ffedi-auth";
+final String scopes = "write%20read%20follow%20push";
 final String appRegisterPath = "/api/v1/apps?client_name=" + clientName +
-    "&redirect_uris=" + redirectURI + "&scopes=" + scopes + "&website=" + sourceURL;
+    "&redirect_uris=" + redirectURI + "&scopes=" + scopes + "&website=" + sourceURLEscaped;
 
 String nextURL = protocol + targetInstance + apiURL + apiTimelinePath + timelineType;
 String prevURL = protocol + targetInstance + apiURL + apiTimelinePath + timelineType;

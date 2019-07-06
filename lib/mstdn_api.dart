@@ -21,8 +21,7 @@ class APIConnector {
     return client.get(latestURL);
   }
   static Future getInformation(IOClient client) {
-    saveTI();
-    instanceInfo = protocol + targetInstance + apiURL + instanceInfoPath;
+    instanceInfo = "https://" + targetInstance + apiURL + instanceInfoPath;
     return client.get(instanceInfo);
   }
 
@@ -32,7 +31,7 @@ class APIConnector {
     } else {
       if (selector == 0) {
         String urlOptions = "?maxPosts=" + maxPosts.toString();
-        latestHomeURL = protocol + loginInstance + apiURL + apiTimelinePath + "home" + urlOptions;
+        latestHomeURL = "https://" + loginInstance + apiURL + apiTimelinePath + "home" + urlOptions;
       } else if (selector == 1) {
         latestHomeURL = nextHomeURL;
       } else if (selector == 2) {

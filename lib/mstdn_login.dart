@@ -1,6 +1,6 @@
 /// Here it is, the file that's going to give me a headache to write.
 import 'package:looking_glass/settings.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -60,20 +60,24 @@ void checkLicenseCompliance(String instance) {
 /// Your move, you discriminatory pieces of work. :)
 
 /// Anyways, this will actually register the app.
-Future<FediApp> registerApp(http.Client client) async {
-  final response = await client.get(protocol + loginInstance + appRegisterPath);
+Future<FediApp> registerApp(http.IOClient client) async {
+  String siteToRegisterFrom = "https://" + loginInstance + appRegisterPath;
+  print(siteToRegisterFrom);
+  final response = await client.post(siteToRegisterFrom);
   if(response.statusCode == 200) {
     return FediApp.fromJson(json.decode(response.body));
   } else {
+    print(response.statusCode.toString());
+    print(response.body);
     throw Exception("Could not register app with " + loginInstance + ".");
   }
 }
 
-Future<OAuthToken> instanceAuth(http.Client client, String authCode) async {
-  String finalAuthURL = protocol + loginInstance + "/oauth/token?client_id="
+Future<OAuthToken> instanceAuth(http.IOClient client, String authCode) async {
+  String finalAuthURL = "https://" + loginInstance + "/oauth/token?client_id="
       + clientID + "&client_secret=" + clientSecret + "&grant_type=authorization_code"
       "&code=" + authCode + "&redirect_uri=" + redirectURI;
-  final response = await client.get(finalAuthURL);
+  final response = await client.post(finalAuthURL);
   if(response.statusCode == 200) {
     return OAuthToken.fromJson(json.decode(response.body));
   } else {

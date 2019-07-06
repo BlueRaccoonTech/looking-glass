@@ -7,6 +7,7 @@ import 'looking_glass_icons.dart' as AppLogo;
 import 'settings.dart';
 
 final specifyAnInstance = TextEditingController();
+final logIntoAnInstance = TextEditingController();
 
 TextSpan makeURL(String linkText, String linkUrl, BuildContext context) {
   return TextSpan(

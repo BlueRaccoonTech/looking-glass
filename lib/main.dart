@@ -12,6 +12,7 @@ import 'interface.dart';
 import 'settings.dart';
 import 'mstdn_login.dart';
 import 'dart:async';
+import 'loginScreen.dart';
 
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:progress_dialog/progress_dialog.dart';
@@ -20,6 +21,7 @@ import 'package:http/io_client.dart';
 import 'package:uni_links/uni_links.dart';
 
 import 'looking_glass_icons.dart' as AppLogo;
+IOClient legitHTTP = new IOClient();
 
 void main() => runApp(MyApp());
 
@@ -41,6 +43,26 @@ class MyListScreen extends StatefulWidget {
   createState() => _MyListScreenState();
 }
 
+void oauthWorkflow(String loggingInInstance) async {
+
+  checkLicenseCompliance(loggingInInstance);
+  if(!appRegistered || loginInstance != loggingInInstance) {
+    loginInstance = loggingInInstance;
+
+    FediApp appRegistration = await registerApp(legitHTTP);
+
+    appRegistered = true;
+    clientID = appRegistration.clientID;
+    clientSecret = appRegistration.clientSecret;
+    saveClientInfo();
+  }
+
+  String authorizeLink = protocol + loginInstance + "/oauth/authorize?"
+      "response_type=code&client_id=" + clientID + "&client_secret=" +
+      clientSecret + "&redirect_uri=" + redirectURI + "&scope=" + scopes;
+  launch(authorizeLink);
+}
+
 class _MyListScreenState extends State {
   List timeline = new List<Status>();
   StreamSubscription _subs;
@@ -50,7 +72,6 @@ class _MyListScreenState extends State {
   bool tlFetchInProgress = false;
   bool infoFetchInProgress = false;
   bool scrollToTopVisible = false;
-  IOClient legitHTTP = new IOClient();
 
   final errorSnackBar = SnackBar(
       content: Text(errorFetching,
@@ -185,25 +206,6 @@ class _MyListScreenState extends State {
       });
       saveLoginInfo();
     }
-  }
-
-  void oauthWorkflow() async {
-    // TODO: Add spot to specify login instance.
-    loginInstance = "transfurrmation.town";
-
-    checkLicenseCompliance(loginInstance);
-
-    FediApp appRegistration = await registerApp(legitHTTP);
-
-    appRegistered = true;
-    clientID = appRegistration.clientID;
-    clientSecret = appRegistration.clientSecret;
-    saveClientInfo();
-
-    String authorizeLink = protocol + loginInstance + "/oauth/authorize?"
-        "response_type=code&client_id=" + clientID + "&client_secret=" +
-        clientSecret + "&redirect_uri=" + redirectURI + "&scope=" + scopes;
-    launch(authorizeLink);
   }
 
   /// Login-pertinent stuff ends here.
@@ -480,6 +482,7 @@ class _MyListScreenState extends State {
   }
 
   dispose() {
+    logIntoAnInstance.dispose();
     specifyAnInstance.dispose();
     _plzScrollForMe.dispose();
     _disposeDeepLinkListener();
@@ -566,6 +569,48 @@ class _MyListScreenState extends State {
               ),
             ],
           ),
+
+          drawer: Drawer(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: <Widget>[
+                DrawerHeader(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        AppLogo.LookingGlass.crystal_ball,
+                        color: Colors.white,
+                      ),
+                      Text(
+                        "   The Looking Glass",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                  decoration: BoxDecoration(
+                    color: headerColor,
+                  ),
+                ),
+                Visibility(
+                  visible: !(isAuthenticated ?? false),
+                  child: ListTile(
+                    title: Text('Login'),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginPage()),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+
           body: Column(
             children: <Widget>[
               Row(
