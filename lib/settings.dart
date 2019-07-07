@@ -18,11 +18,15 @@ final   teKey = 'tokenExpiryIn';
 final   mtKey = 'madeTokenAt';
 final   muKey = 'meURL';
 
+/// Keys for silly fun!
+final   plKey = 'postLabel';
+
 /// Preferences to be loaded...
 String  targetInstance = "mastodon.social";
 String  timelineType = "public";
 bool    localOnly = true;
 int     maxPosts = 20;
+String  postLabel = "Post";
 
 /// App info to be loaded...
 bool    appRegistered;
@@ -53,6 +57,8 @@ readPrefs() async {
   tokenExpiryIn   = prefs.getInt(teKey) ?? null;
   madeTokenAt     = prefs.getInt(mtKey) ?? null;
   meURL           = prefs.getString(muKey) ?? null;
+
+  postLabel       = prefs.getString(plKey) ?? "Post";
 }
 
 saveTI() async {
@@ -76,6 +82,11 @@ saveLoginInfo() async {
   prefs.setInt(teKey, tokenExpiryIn);
   prefs.setInt(mtKey, madeTokenAt);
   prefs.setString(muKey, meURL);
+}
+
+savePostLabel() async {
+  final prefs   = await SharedPreferences.getInstance();
+  prefs.setString(plKey, postLabel);
 }
 
 final Color headerColor = Colors.black54;
@@ -108,3 +119,11 @@ String instanceInfo = protocol + targetInstance + apiURL + instanceInfoPath;
 String latestHomeURL;
 String nextHomeURL;
 String prevHomeURL;
+
+final sentPostSnackBar = SnackBar(
+  content: Text("Post submitted successfully!",
+    textAlign: TextAlign.center,
+    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+  ),
+  backgroundColor: Colors.green,
+);

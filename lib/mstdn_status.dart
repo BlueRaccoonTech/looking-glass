@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:http/io_client.dart' as http;
 import 'settings.dart';
 import 'dart:io';
+import 'dart:convert';
+import 'main.dart';
 
 class Status {
   final String id;
@@ -89,4 +91,21 @@ void reblogStatus(http.IOClient client, String postID) async {
       throw Exception("Ran head-first into an issue reblogging that post, sorry.");
     }
   }
+}
+
+Future<Status> snedPost(http.IOClient client, String visibility, String status, String subject) async {
+  String subjectURLPart = "";
+
+  if (subject != null) {
+    subjectURLPart = "&spoiler_text=" + subject;
+  }
+  String postURL = "https://" + loginInstance + "/api/v1/statuses?visibility="
+    + visibility + subjectURLPart + "&status=" + status;
+  final response = await client.post(postURL, headers: {HttpHeaders.authorizationHeader: "Bearer " + accessToken});
+  // TODO: Add idempotency key to headers created at opening of message composer
+  if(response.statusCode != 200) {
+    throw Exception("Something went wrong while revoking credentials.");
+  }
+  scaffoldKey.currentState.showSnackBar(sentPostSnackBar);
+  return Status.fromJson(json.decode(response.body));
 }

@@ -14,6 +14,7 @@ import 'mstdn_login.dart';
 import 'dart:async';
 import 'loginScreen.dart';
 import 'dart:io';
+import 'composeScreen.dart';
 
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:progress_dialog/progress_dialog.dart';
@@ -645,10 +646,15 @@ class _MyListScreenState extends State {
             ),
           ),
           floatingActionButton: Visibility(
-            visible: scrollToTopVisible,
+            visible: (isAuthenticated ?? false),
             child: FloatingActionButton(
-              onPressed: _scrollToTop,
-              child: Icon(Icons.arrow_upward),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ComposePageWidget()),
+                );
+              },
+              child: Icon(Icons.message),
             ),
           ),
 
